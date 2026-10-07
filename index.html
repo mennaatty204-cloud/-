@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>لعبة الدفاع بالمدفع والدمج</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            background-color: #1a1a1a;
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+            touch-action: none;
+        }
+
+        /* حاوية اللعبة */
+        #game-container {
+            position: relative;
+            width: 360px;
+            height: 600px;
+            background-color: #222;
+            border: 4px solid #444;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            touch-action: none;
+        }
+
+        /* المسارات الثلاثة */
+        .lane-line {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            border-right: 2px dashed #333;
+        }
+        .lane-1 { left: 33.33%; }
+        .lane-2 { left: 66.66%; }
+
+        /* خط المدافع المساندة (الأمامي) */
+        #support-line {
+            position: absolute;
+            bottom: 120px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        /* خط النهاية */
+        #finish-line {
+            position: absolute;
+            bottom: 60px;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background-color: #ff4444;
+            box-shadow: 0 0 10px #ff4444;
+        }
+
+        /* المدفع الرئيسي */
+        .cannon {
+            position: absolute;
+            bottom: 10px;
+            width: 50px;
+            height: 40px;
+            background-color: #4CAF50;
+            border-radius: 8px 8px 0 0;
+            transition: left 0.1s ease-out;
+            transform: translateX(-50%);
+            z-index: 10;
+            cursor: pointer;
+        }
+        .cannon::after {
+            content: '';
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 14px;
+            height: 16px;
+            background-color: #2E7D32;
+            border-radius: 4px 4px 0 0;
+        }
+
+        /* المدافع الفرعية المثبتة والقابلة للسحب */
+        .mini-cannon {
+            position: absolute;
+            bottom: 120px;
+            width: 36px;
+            height: 30px;
+            background-color: #00bcd4;
+            border-radius: 6px 6px 0 0;
+            transform: translateX(-50%);
+            z-index: 15;
+            cursor: grab;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            color: #000;
+            box-shadow: 0 0 8px rgba(0, 188, 212, 0.6);
+            touch-action: none;
+        }
+        .mini-cannon::after {
+            content: '';
+            position: absolute;
+            top: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 8px;
+            height: 10px;
+            background-color: inherit;
+            filter: brightness(0.7);
+        }
+        .mini-cannon.dragging {
+            opacity: 0.8;
+            cursor: grabbing;
+            z-index: 25;
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+
+        /* الأعداء */
+        .enemy {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background-color: #e91e63;
+            border-radius: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        /* القذائف */
+        .bullet {
+            position: absolute;
+            width: 8px;
+            height: 16px;
+            background-color: #ffeb3b;
+            border-radius: 4px;
+            transform: translateX(-50%);
+            box-shadow: 0 0 8px #ffeb3b;
+        }
+
+        /* الهدايا */
+        .gift {
+            position: absolute;
+            width: 32px;
+            height: 32px;
+            background-color: #9c27b0;
+            border-radius: 6px;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            animation: pulse 0.8s infinite alternate;
+            z-index: 8;
+        }
+        @keyframes pulse {
+            from { transform: translateX(-50%) scale(0.9); }
+            to { transform: translateX(-50%) scale(1.1); }
+        }
+
+        /* واجهة المستخدم UI */
+        #ui-layer {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 20;
+            pointer-events: none;
+        }
+
+        .bar-container {
+            width: 100%;
+            height: 16px;
+            background-color: #333;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #555;
+        }
+
+        #danger-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #ff9800, #f44336);
+            transition: width 0.3s ease;
+        }
+
+        #score-display {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        /* أزرار إعادة اللعب والإنهاء */
+        .btn {
+            background-color: #333;
+            color: white;
+            border: 2px solid #555;
+            padding: 15px 25px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+        .btn:active {
+            background-color: #555;
+            transform: scale(0.95);
+        }
+
+        /* شاشة انتهاء اللعبة */
+        #game-over {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0,0,0,0.85);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 30;
+        }
+        #game-over.hidden { display: none; }
+        #game-over h2 { font-size: 32px; color: #f44336; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <!-- المسارات -->
+        <div class="lane-line lane-1"></div>
+        <div class="lane-line lane-2"></div>
+
+        <!-- واجهة المستخدم -->
+        <div id="ui-layer">
+            <div id="score-display">النقاط: <span id="score">0</span></div>
+            <div class="bar-container">
+                <div id="danger-bar"></div>
+            </div>
+        </div>
+
+        <!-- الخطوط -->
+        <div id="support-line"></div>
+        <div id="finish-line"></div>
+
+        <!-- المدفع الرئيسي -->
+        <div id="player-cannon" class="cannon"></div>
+
+        <!-- شاشة الخسارة -->
+        <div id="game-over" class="hidden">
+            <h2>خسرت المستوى!</h2>
+            <p style="margin-bottom: 20px;">تجاوز الكثير من الأعداء خط النهاية</p>
+            <button class="btn" onclick="resetGame()">إعادة اللعب</button>
+        </div>
+    </div>
+
+    <script>
+        const lanes = [60, 180, 300]; // إحداثيات المسارات
+        let currentLane = 1;
+        
+        let score = 0;
+        let dangerLevel = 0;
+        const maxDanger = 100;
+        let isGameOver = false;
+
+        let bullets = [];
+        let enemies = [];
+        let gifts = [];
+        
+        // متغيرات التحكم بالتاتش والإطلاق المستمر
+        let isTouching = false;
+        let autoShootInterval = null;
+        const autoShootRate = 200; // الإطلاق كل 200 ميلي ثانية عند الاستمرار بالضغط
+
+        // مصفوفة حفظ كائنات المدافع الصغيرة في المسارات [lane_0, lane_1, lane_2]
+        let miniCannons = [null, null, null];
+
+        // ألوان المدافع حسب مستواها عند الدمج
+        const levelColors = {
+            1: '#00bcd4', // أزرق سماوي
+            2: '#ff9800', // برتقالي
+            3: '#e91e63', // وردي
+            4: '#9c27b0', // بنفسجي
+            5: '#ffeb3b'  // أصفر ذهبي
+        };
+
+        const playerCannon = document.getElementById('player-cannon');
+        const gameContainer = document.getElementById('game-container');
+        const dangerBar = document.getElementById('danger-bar');
+        const scoreDisplay = document.getElementById('score');
+        const gameOverScreen = document.getElementById('game-over');
+
+        function updateCannonPosition() {
+            playerCannon.style.left = lanes[currentLane] + 'px';
+        }
+        updateCannonPosition();
+
+        // إجمالي مستويات المدافع المساندة لزيادة قوة وأعداد الأعداء
+        function getTotalMiniCannonsPower() {
+            return miniCannons.reduce((sum, cannon) => sum + (cannon ? cannon.level : 0), 0);
+        }
+
+        // تحديث المسار بناءً على إحداثيات اللمس/الماوس
+        function updateLaneFromX(clientX) {
+            if (isGameOver) return;
+            const rect = gameContainer.getBoundingClientRect();
+            const touchX = clientX - rect.left;
+
+            let closestLane = 0;
+            let minDiff = Math.abs(touchX - lanes[0]);
+
+            for (let i = 1; i < lanes.length; i++) {
+                let diff = Math.abs(touchX - lanes[i]);
+                if (diff < minDiff) {
+                    minDiff = diff;
+                    closestLane = i;
+                }
+            }
+
+            if (currentLane !== closestLane) {
+                currentLane = closestLane;
+                updateCannonPosition();
+            }
+        }
+
+        // إطلاق النار من المدفع الرئيسي
+        function shoot() {
+            if (isGameOver) return;
+            createBullet(lanes[currentLane], 530, 1);
+        }
+
+        // إعداد أحداث اللمس والماوس لحركة المدفع والإطلاق المستمر
+        function setupTouchAndShootControls() {
+            function handleStart(e) {
+                if (isGameOver) return;
+                // إذا كان اللمس على مدفع فرعي ثابت، نتجاهل إطلاق المدفع الرئيسي
+                if (e.target.classList.contains('mini-cannon')) return;
+
+                isTouching = true;
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                updateLaneFromX(clientX);
+
+                // إطلاق طلقة فورية ثم البدء بالإطلاق المستمر
+                shoot();
+                if (autoShootInterval) clearInterval(autoShootInterval);
+                autoShootInterval = setInterval(shoot, autoShootRate);
+            }
+
+            function handleMove(e) {
+                if (!isTouching || isGameOver) return;
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                updateLaneFromX(clientX);
+            }
+
+            function handleEnd() {
+                isTouching = false;
+                if (autoShootInterval) {
+                    clearInterval(autoShootInterval);
+                    autoShootInterval = null;
+                }
+            }
+
+            gameContainer.addEventListener('touchstart', handleStart);
+            gameContainer.addEventListener('touchmove', handleMove);
+            gameContainer.addEventListener('touchend', handleEnd);
+
+            gameContainer.addEventListener('mousedown', handleStart);
+            gameContainer.addEventListener('mousemove', handleMove);
+            gameContainer.addEventListener('mouseup', handleEnd);
+            gameContainer.addEventListener('mouseleave', handleEnd);
+        }
+
+        setupTouchAndShootControls();
+
+        function createBullet(x, y, damage = 1) {
+            const bulletElem = document.createElement('div');
+            bulletElem.className = 'bullet';
+            bulletElem.style.left = x + 'px';
+            bulletElem.style.top = y + 'px';
+            
+            // تغيير شكل وحجم القذيفة إذا كانت القوة أكبر من 1
+            if (damage > 1) {
+                bulletElem.style.width = (8 + damage * 2) + 'px';
+                bulletElem.style.height = (16 + damage * 2) + 'px';
+                bulletElem.style.backgroundColor = levelColors[Math.min(damage, 5)] || '#ffeb3b';
+            }
+
+            gameContainer.appendChild(bulletElem);
+
+            bullets.push({
+                x: x,
+                y: y,
+                damage: damage,
+                element: bulletElem
+            });
+        }
+
+        function spawnEnemy() {
+            if (isGameOver) return;
+
+            const laneIndex = Math.floor(Math.random() * 3);
+            const laneX = lanes[laneIndex];
+
+            // الميزة 1: كلما زاد مجموع مستويات المدافع الفرعية تزداد قوة وصحة الأعداء (Max HP)
+            const powerBonus = getTotalMiniCannonsPower();
+            const maxHpCap = 4 + powerBonus;
+            const hp = Math.floor(Math.random() * maxHpCap) + 1;
+
+            const enemyElem = document.createElement('div');
+            enemyElem.className = 'enemy';
+            enemyElem.style.left = laneX + 'px';
+            enemyElem.style.top = '-40px';
+            enemyElem.innerText = hp;
+            
+            if(hp === 2) enemyElem.style.backgroundColor = '#ff9800';
+            if(hp >= 3) enemyElem.style.backgroundColor = '#9c27b0';
+
+            gameContainer.appendChild(enemyElem);
+
+            enemies.push({
+                x: laneX,
+                y: -40,
+                hp: hp,
+                maxHp: hp,
+                lane: laneIndex,
+                speed: 1.8 + Math.min(powerBonus * 0.1, 1.5),
+                element: enemyElem
+            });
+
+            // الميزة 1 (تابع): يزداد عدد ومعدل ظهور الأعداء كلما زادت المدافع
+            const baseSpawnDelay = Math.random() * 1500 + 1200;
+            const nextSpawn = Math.max(400, baseSpawnDelay - (powerBonus * 120));
+            setTimeout(spawnEnemy, nextSpawn);
+        }
+
+        function spawnGift(x, y) {
+            const giftElem = document.createElement('div');
+            giftElem.className = 'gift';
+            giftElem.style.left = x + 'px';
+            giftElem.style.top = y + 'px';
+            giftElem.innerText = '🎁';
+            gameContainer.appendChild(giftElem);
+
+            gifts.push({
+                x: x,
+                y: y,
+                element: giftElem
+            });
+        }
+
+        // إنشاء أو تحديث مدفع صغير
+        function createOrUpdateMiniCannon(laneIndex, level = 1) {
+            if (miniCannons[laneIndex]) {
+                // دمج المستويات إذا كان هناك مدفع موجود بالفعل
+                miniCannons[laneIndex].level += level;
+                updateMiniCannonAppearance(miniCannons[laneIndex]);
+            } else {
+                // إنشاء مدفع جديد
+                const miniElem = document.createElement('div');
+                miniElem.className = 'mini-cannon';
+                miniElem.style.left = lanes[laneIndex] + 'px';
+                
+                const miniData = {
+                    lane: laneIndex,
+                    level: level,
+                    element: miniElem,
+                    lastShot: 0
+                };
+
+                updateMiniCannonAppearance(miniData);
+                makeCannonDraggable(miniData);
+
+                gameContainer.appendChild(miniElem);
+                miniCannons[laneIndex] = miniData;
+            }
+        }
+
+        function updateMiniCannonAppearance(cannon) {
+            cannon.element.innerText = 'L' + cannon.level;
+            const color = levelColors[Math.min(cannon.level, 5)] || '#ff0055';
+            cannon.element.style.backgroundColor = color;
+            cannon.element.style.boxShadow = `0 0 10px ${color}`;
+        }
+
+        // إمكانية سحب ودمج المدافع الفرعية بالتاتش / الماوس
+        function makeCannonDraggable(cannon) {
+            const elem = cannon.element;
+
+            let isDragging = false;
+
+            function onStart(e) {
+                if (isGameOver) return;
+                e.stopPropagation(); // منع تفعيل إطلاق المدفع الأساسي عند سحب المدفع الفرعي
+                isDragging = true;
+                elem.classList.add('dragging');
+                
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                const rect = gameContainer.getBoundingClientRect();
+
+                elem.style.left = (clientX - rect.left) + 'px';
+                elem.style.top = (clientY - rect.top) + 'px';
+            }
+
+            function onMove(e) {
+                if (!isDragging) return;
+                e.stopPropagation();
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                const rect = gameContainer.getBoundingClientRect();
+
+                let x = clientX - rect.left;
+                let y = clientY - rect.top;
+
+                elem.style.left = x + 'px';
+                elem.style.top = y + 'px';
+            }
+
+            function onEnd(e) {
+                if (!isDragging) return;
+                isDragging = false;
+                elem.classList.remove('dragging');
+
+                const rect = gameContainer.getBoundingClientRect();
+                const lastTouch = e.changedTouches ? e.changedTouches[0] : e;
+                const dropX = lastTouch.clientX - rect.left;
+
+                // تحديد أقرب مسار لمكان الإسقاط
+                let targetLane = 0;
+                let minDistance = Math.abs(dropX - lanes[0]);
+                for (let i = 1; i < 3; i++) {
+                    let dist = Math.abs(dropX - lanes[i]);
+                    if (dist < minDistance) {
+                        minDistance = dist;
+                        targetLane = i;
+                    }
+                }
+
+                const oldLane = cannon.lane;
+
+                if (targetLane === oldLane) {
+                    // إرجاع المدفع لمكانه في نفس المسار
+                    elem.style.left = lanes[oldLane] + 'px';
+                    elem.style.top = '';
+                    elem.style.bottom = '120px';
+                } else {
+                    // سحبه إلى مسار آخر
+                    miniCannons[oldLane] = null; // تفريغ المسار القديم
+
+                    if (miniCannons[targetLane]) {
+                        // دمج المدافع
+                        miniCannons[targetLane].level += cannon.level;
+                        updateMiniCannonAppearance(miniCannons[targetLane]);
+                        
+                        // حذف المدفع المسحوب بعد الدمج
+                        elem.remove();
+                    } else {
+                        // نقل المدفع إلى المسار الفارغ
+                        cannon.lane = targetLane;
+                        elem.style.left = lanes[targetLane] + 'px';
+                        elem.style.top = '';
+                        elem.style.bottom = '120px';
+                        miniCannons[targetLane] = cannon;
+                    }
+                }
+            }
+
+            elem.addEventListener('touchstart', onStart);
+            document.addEventListener('touchmove', onMove);
+            document.addEventListener('touchend', onEnd);
+
+            elem.addEventListener('mousedown', onStart);
+            document.addEventListener('mousemove', onMove);
+            document.addEventListener('mouseup', onEnd);
+        }
+
+        // إطلاق النار التلقائي للمدافع الصغيرة حسب مستواها
+        function handleMiniCannonsShooting() {
+            const now = Date.now();
+            miniCannons.forEach((cannon) => {
+                if (cannon) {
+                    const cooldown = Math.max(400, 1200 - (cannon.level * 100)); 
+                    if (now - cannon.lastShot >= cooldown) {
+                        createBullet(lanes[cannon.lane], 460, cannon.level);
+                        cannon.lastShot = now;
+                    }
+                }
+            });
+        }
+
+        // Loop الرئيسي للعبة
+        function gameLoop() {
+            if (isGameOver) return;
+
+            handleMiniCannonsShooting();
+
+            // 1. تحريك القذائف
+            for (let i = bullets.length - 1; i >= 0; i--) {
+                let b = bullets[i];
+                b.y -= 7;
+                b.element.style.top = b.y + 'px';
+
+                if (b.y < -20) {
+                    b.element.remove();
+                    bullets.splice(i, 1);
+                }
+            }
+
+            // 2. تحريك الهدايا وضوابط القواعد الجديدة
+            for (let i = gifts.length - 1; i >= 0; i--) {
+                let g = gifts[i];
+                g.y += 2;
+                g.element.style.top = g.y + 'px';
+
+                const laneIndex = lanes.indexOf(g.x);
+
+                // الميزة 2: إذا اصطدمت الهدية بمدفع ثابت تنقص من مستواه ومستواه يقل
+                if (g.y >= 440 && g.y <= 480 && miniCannons[laneIndex] !== null) {
+                    const targetCannon = miniCannons[laneIndex];
+                    targetCannon.level -= 1;
+
+                    if (targetCannon.level <= 0) {
+                        // تدمير المدفع إذا وصل مستواه إلى 0
+                        targetCannon.element.remove();
+                        miniCannons[laneIndex] = null;
+                    } else {
+                        // إنقاص المستوى وتحديث المظهر
+                        updateMiniCannonAppearance(targetCannon);
+                    }
+
+                    g.element.remove();
+                    gifts.splice(i, 1);
+                    continue;
+                }
+
+                // القاعدة: إذا وصلت الهدية إلى خط النهاية (ولم يرتطم بالمدفع) -> تتحول إلى مدفع جديد
+                if (g.y >= 530) {
+                    if (miniCannons[laneIndex] === null) {
+                        createOrUpdateMiniCannon(laneIndex, 1);
+                    }
+                    g.element.remove();
+                    gifts.splice(i, 1);
+                    continue;
+                }
+            }
+
+            // 3. تحريك الأعداء واختبار التصادم
+            for (let i = enemies.length - 1; i >= 0; i--) {
+                let e = enemies[i];
+                e.y += e.speed;
+                e.element.style.top = e.y + 'px';
+
+                // الاصطدام بالقذائف
+                for (let j = bullets.length - 1; j >= 0; j--) {
+                    let b = bullets[j];
+                    if (Math.abs(b.x - e.x) < 20 && Math.abs(b.y - e.y) < 25) {
+                        b.element.remove();
+                        bullets.splice(j, 1);
+
+                        e.hp -= b.damage; // إلحاق ضرر يعتمد على قوة القذيفة
+                        e.element.innerText = Math.max(0, e.hp);
+
+                        if (e.hp <= 0) {
+                            if (e.maxHp >= 2 && Math.random() < 0.6) {
+                                spawnGift(e.x, e.y);
+                            }
+
+                            score += e.maxHp * 10;
+                            scoreDisplay.innerText = score;
+
+                            e.element.remove();
+                            enemies.splice(i, 1);
+                            break;
+                        }
+                    }
+                }
+
+                // وصول العدو لخط النهاية
+                if (e && e.y >= 530) {
+                    dangerLevel += 15;
+                    if (dangerLevel > maxDanger) dangerLevel = maxDanger;
+                    dangerBar.style.width = dangerLevel + '%';
+
+                    e.element.remove();
+                    enemies.splice(i, 1);
+
+                    if (dangerLevel >= maxDanger) {
+                        endGame();
+                    }
+                }
+            }
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        // أزرار الكيبورد للكمبيوتر
+        document.addEventListener('keydown', (e) => {
+            if (isGameOver) return;
+            if (e.key === 'ArrowLeft') {
+                if (currentLane < 2) currentLane++;
+                updateCannonPosition();
+            }
+            if (e.key === 'ArrowRight') {
+                if (currentLane > 0) currentLane--;
+                updateCannonPosition();
+            }
+            if (e.key === ' ' || e.key === 'ArrowUp') shoot();
+        });
+
+        function endGame() {
+            isGameOver = true;
+            if (autoShootInterval) {
+                clearInterval(autoShootInterval);
+                autoShootInterval = null;
+            }
+            gameOverScreen.classList.remove('hidden');
+        }
+
+        function resetGame() {
+            bullets.forEach(b => b.element.remove());
+            enemies.forEach(e => e.element.remove());
+            gifts.forEach(g => g.element.remove());
+            
+            miniCannons.forEach(cannon => {
+                if(cannon) cannon.element.remove();
+            });
+
+            bullets = [];
+            enemies = [];
+            gifts = [];
+            miniCannons = [null, null, null];
+
+            score = 0;
+            dangerLevel = 0;
+            isGameOver = false;
+
+            scoreDisplay.innerText = score;
+            dangerBar.style.width = '0%';
+            gameOverScreen.classList.add('hidden');
+
+            currentLane = 1;
+            updateCannonPosition();
+
+            gameLoop();
+            spawnEnemy();
+        }
+
+        gameLoop();
+        spawnEnemy();
+    </script>
+</body>
+</html>
