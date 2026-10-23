@@ -1,0 +1,2377 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>State.io Clone - خريطة مقاطعات متصلة</title>
+    <style>
+    /* Tailwind-equivalent utilities (offline) */
+    *,::before,::after{border-width:0;border-style:solid;border-color:#e5e7eb}
+button{font:inherit;color:inherit;background:transparent;padding:0;border:0 solid #e5e7eb}
+h1,h2,p{font-size:inherit;font-weight:inherit}
+svg{display:block}
+.ico{width:1em;height:1em;display:inline-block;vertical-align:-0.125em;flex-shrink:0}
+@keyframes pulse{50%{opacity:.5}}
+    .fixed{position:fixed}
+    .relative{position:relative}
+    .inset-0{inset:0}
+    .left-1\/2{left:50%}
+    .top-16{top:4rem}
+    .-translate-x-1\/2{transform:translateX(-50%)}
+    .flex{display:flex}
+    .flex-1{flex:1 1 0%}
+    .flex-nowrap{flex-wrap:nowrap}
+    .flex-wrap{flex-wrap:wrap}
+    .shrink-0{flex-shrink:0}
+    .items-center{align-items:center}
+    .justify-between{justify-content:space-between}
+    .justify-center{justify-content:center}
+    .min-h-0{min-height:0}
+    .min-w-0{min-width:0}
+    .mx-auto{margin-left:auto;margin-right:auto}
+    .mb-2{margin-bottom:.5rem}
+    .w-full{width:100%}
+    .max-w-4xl{max-width:56rem}
+    .max-w-sm{max-width:24rem}
+    .overflow-hidden{overflow:hidden}
+    .truncate{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .whitespace-nowrap{white-space:nowrap}
+    .cursor-pointer{cursor:pointer}
+    .pointer-events-none{pointer-events:none}
+    .opacity-0{opacity:0}
+    .opacity-40{opacity:.4}
+    .text-center{text-align:center}
+    .z-10{z-index:10}
+    .z-50{z-index:50}
+    .z-\[55\]{z-index:55}
+    .z-\[60\]{z-index:60}
+    .z-\[65\]{z-index:65}
+    .z-\[70\]{z-index:70}
+    .animate-pulse{animation:pulse 2s cubic-bezier(.4,0,.6,1) infinite}
+    .transition{transition-property:color,background-color,border-color,opacity,box-shadow,transform;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-duration:.15s}
+    .transition-opacity{transition-property:opacity;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-duration:.15s}
+    .duration-300{transition-duration:.3s}
+    .backdrop-blur-md{backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+    .backdrop-blur-lg{backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+    .leading-tight{line-height:1.25}
+    .leading-relaxed{line-height:1.625}
+    .font-semibold{font-weight:600}
+    .font-bold{font-weight:700}
+    .font-black{font-weight:900}
+    .border{border-width:1px}
+    .border-b{border-bottom-width:1px}
+    .border-t{border-top-width:1px}
+    .rounded-lg{border-radius:.5rem}
+    .rounded-xl{border-radius:.75rem}
+    .rounded-3xl{border-radius:1.5rem}
+    .rounded-full{border-radius:9999px}
+    .rounded-b-2xl{border-bottom-right-radius:1rem;border-bottom-left-radius:1rem}
+    .text-xs{font-size:.75rem;line-height:1rem}
+    .text-sm{font-size:.875rem;line-height:1.25rem}
+    .text-lg{font-size:1.125rem;line-height:1.75rem}
+    .text-xl{font-size:1.25rem;line-height:1.75rem}
+    .text-3xl{font-size:1.875rem;line-height:2.25rem}
+    .text-\[10px\]{font-size:10px}
+    .text-\[11px\]{font-size:11px}
+    .h-16{height:4rem}
+    .h-9{height:2.25rem}
+    .h-2\.5{height:.625rem}
+    .w-16{width:4rem}
+    .w-9{width:2.25rem}
+    .w-2\.5{width:.625rem}
+    .p-4{padding:1rem}
+    .p-6{padding:1.5rem}
+    .p-0\.5{padding:.125rem}
+    .px-2{padding-left:.5rem;padding-right:.5rem}
+    .px-2\.5{padding-left:.625rem;padding-right:.625rem}
+    .px-3{padding-left:.75rem;padding-right:.75rem}
+    .px-4{padding-left:1rem;padding-right:1rem}
+    .py-1{padding-top:.25rem;padding-bottom:.25rem}
+    .py-1\.5{padding-top:.375rem;padding-bottom:.375rem}
+    .py-2{padding-top:.5rem;padding-bottom:.5rem}
+    .py-3{padding-top:.75rem;padding-bottom:.75rem}
+    .pt-1\.5{padding-top:.375rem}
+    .gap-0\.5{gap:.125rem}
+    .gap-1{gap:.25rem}
+    .gap-1\.5{gap:.375rem}
+    .gap-2{gap:.5rem}
+    .shadow-lg{box-shadow:0 10px 15px -3px var(--sc,rgba(0,0,0,.1)),0 4px 6px -4px var(--sc,rgba(0,0,0,.1))}
+    .shadow-xl{box-shadow:0 20px 25px -5px var(--sc,rgba(0,0,0,.1)),0 8px 10px -6px var(--sc,rgba(0,0,0,.1))}
+    .shadow-2xl{box-shadow:0 25px 50px -12px rgba(0,0,0,.25)}
+    .ring-2{box-shadow:0 0 0 2px var(--rc,#3b82f6)}
+    .ring-amber-400{--rc:#fbbf24}
+    .space-y-2>:not([hidden])~:not([hidden]){margin-top:0.5rem}
+    .space-y-5>:not([hidden])~:not([hidden]){margin-top:1.25rem}
+    .space-y-6>:not([hidden])~:not([hidden]){margin-top:1.5rem}
+    .bg-amber-300{background-color:#fcd34d}
+    .text-amber-300{color:#fcd34d}
+    .border-amber-300{border-color:#fcd34d}
+    .bg-amber-400{background-color:#fbbf24}
+    .text-amber-400{color:#fbbf24}
+    .border-amber-400{border-color:#fbbf24}
+    .bg-amber-500{background-color:#f59e0b}
+    .text-amber-500{color:#f59e0b}
+    .border-amber-500{border-color:#f59e0b}
+    .bg-amber-600{background-color:#d97706}
+    .text-amber-600{color:#d97706}
+    .border-amber-600{border-color:#d97706}
+    .bg-blue-400{background-color:#60a5fa}
+    .text-blue-400{color:#60a5fa}
+    .border-blue-400{border-color:#60a5fa}
+    .bg-blue-500{background-color:#3b82f6}
+    .text-blue-500{color:#3b82f6}
+    .border-blue-500{border-color:#3b82f6}
+    .bg-blue-600{background-color:#2563eb}
+    .text-blue-600{color:#2563eb}
+    .border-blue-600{border-color:#2563eb}
+    .bg-emerald-300{background-color:#6ee7b7}
+    .text-emerald-300{color:#6ee7b7}
+    .border-emerald-300{border-color:#6ee7b7}
+    .bg-emerald-400{background-color:#34d399}
+    .text-emerald-400{color:#34d399}
+    .border-emerald-400{border-color:#34d399}
+    .bg-emerald-500{background-color:#10b981}
+    .text-emerald-500{color:#10b981}
+    .border-emerald-500{border-color:#10b981}
+    .bg-emerald-600{background-color:#059669}
+    .text-emerald-600{color:#059669}
+    .border-emerald-600{border-color:#059669}
+    .bg-red-400{background-color:#f87171}
+    .text-red-400{color:#f87171}
+    .border-red-400{border-color:#f87171}
+    .bg-red-500{background-color:#ef4444}
+    .text-red-500{color:#ef4444}
+    .border-red-500{border-color:#ef4444}
+    .bg-rose-300{background-color:#fda4af}
+    .text-rose-300{color:#fda4af}
+    .border-rose-300{border-color:#fda4af}
+    .bg-sky-300{background-color:#7dd3fc}
+    .text-sky-300{color:#7dd3fc}
+    .border-sky-300{border-color:#7dd3fc}
+    .bg-slate-200{background-color:#e2e8f0}
+    .text-slate-200{color:#e2e8f0}
+    .border-slate-200{border-color:#e2e8f0}
+    .bg-slate-300{background-color:#cbd5e1}
+    .text-slate-300{color:#cbd5e1}
+    .border-slate-300{border-color:#cbd5e1}
+    .bg-slate-400{background-color:#94a3b8}
+    .text-slate-400{color:#94a3b8}
+    .border-slate-400{border-color:#94a3b8}
+    .bg-slate-600{background-color:#475569}
+    .text-slate-600{color:#475569}
+    .border-slate-600{border-color:#475569}
+    .bg-slate-700{background-color:#334155}
+    .text-slate-700{color:#334155}
+    .border-slate-700{border-color:#334155}
+    .bg-slate-800{background-color:#1e293b}
+    .text-slate-800{color:#1e293b}
+    .border-slate-800{border-color:#1e293b}
+    .bg-slate-900{background-color:#0f172a}
+    .text-slate-900{color:#0f172a}
+    .border-slate-900{border-color:#0f172a}
+    .bg-slate-950{background-color:#020617}
+    .text-slate-950{color:#020617}
+    .border-slate-950{border-color:#020617}
+    .bg-white{background-color:#ffffff}
+    .text-white{color:#ffffff}
+    .border-white{border-color:#ffffff}
+    .bg-amber-500\/20{background-color:rgba(245,158,11,0.2)}
+    .bg-emerald-500\/20{background-color:rgba(16,185,129,0.2)}
+    .bg-blue-500\/20{background-color:rgba(59,130,246,0.2)}
+    .bg-red-500\/20{background-color:rgba(239,68,68,0.2)}
+    .bg-slate-800\/80{background-color:rgba(30,41,59,0.8)}
+    .bg-slate-900\/90{background-color:rgba(15,23,42,0.9)}
+    .bg-slate-900\/95{background-color:rgba(15,23,42,0.95)}
+    .bg-slate-950\/80{background-color:rgba(2,6,23,0.8)}
+    .bg-slate-950\/85{background-color:rgba(2,6,23,0.85)}
+    .border-amber-500\/30{border-color:rgba(245,158,11,0.3)}
+    .border-emerald-500\/30{border-color:rgba(16,185,129,0.3)}
+    .border-blue-500\/30{border-color:rgba(59,130,246,0.3)}
+    .border-red-500\/30{border-color:rgba(239,68,68,0.3)}
+    .border-slate-700\/50{border-color:rgba(51,65,85,0.5)}
+    .shadow-amber-500\/25{--sc:rgba(245,158,11,0.25)}
+    .shadow-blue-500\/25{--sc:rgba(59,130,246,0.25)}
+    .shadow-blue-500\/30{--sc:rgba(59,130,246,0.3)}
+    .shadow-emerald-500\/25{--sc:rgba(16,185,129,0.25)}
+    .hidden{display:none}
+    .hover\:bg-amber-500:hover{background-color:#f59e0b}
+    .hover\:bg-blue-500:hover{background-color:#3b82f6}
+    .hover\:bg-emerald-500:hover{background-color:#10b981}
+    .hover\:bg-slate-700:hover{background-color:#334155}
+    @media (min-width:640px){.sm\:flex{display:flex}.sm\:inline{display:inline}}
+    @media (min-width:768px){.md\:h-20{height:5rem}.md\:w-20{width:5rem}.md\:p-8{padding:2rem}.md\:text-2xl{font-size:1.5rem;line-height:2rem}.md\:text-4xl{font-size:2.25rem;line-height:2.5rem}.md\:text-base{font-size:1rem;line-height:1.5rem}.md\:text-sm{font-size:.875rem;line-height:1.25rem}}
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { height: 100%; }
+        body {
+            font-family: 'Cairo', 'Segoe UI', Tahoma, 'Noto Sans Arabic', 'Geeza Pro', Arial, sans-serif;
+            user-select: none;
+            overflow: hidden;
+            background: #0b1220;
+            color: #e2e8f0;
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .diffBtn{display:block;transition:filter .15s}
+        .diffBtn:hover{filter:brightness(1.15)}
+        .diffSub{display:block;font-size:11px;font-weight:600;opacity:.85;margin-top:2px}
+        canvas {
+            position: absolute;
+            inset: 0;
+            display: block;
+            touch-action: none;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header UI -->
+    <header class="shrink-0 w-full max-w-4xl px-3 py-2 flex flex-nowrap justify-between items-center gap-2 z-10 bg-slate-900/90 backdrop-blur-md rounded-b-2xl border-b border-slate-700/50 shadow-xl">
+        <div class="flex items-center gap-2 min-w-0">
+            <div class="w-9 h-9 shrink-0 rounded-xl bg-blue-600 hidden sm:flex items-center justify-center font-black text-lg shadow-lg shadow-blue-500/30">
+                <svg class="ico" viewBox="0 0 512 512" fill="currentColor" aria-hidden="true"><path d="M256 0c4.6 0 9.2 1 13.4 2.9l188.4 79.9c22 9.3 38.4 31 38.3 57.2-.5 99.2-41.3 280.7-213.6 363.2-16.7 8-36.1 8-52.8 0C57.3 420.7 16.6 239.2 16.1 140c-.1-26.2 16.3-47.9 38.3-57.2L242.7 2.9C246.9 1 251.4 0 256 0m0 66.8v378.1c138-66.8 175.1-214.8 176-303.4L256 66.9z"/></svg>
+            </div>
+            <div class="min-w-0 overflow-hidden">
+                <h1 id="levelTitle" class="font-bold text-sm md:text-base leading-tight whitespace-nowrap truncate">المستوى 1</h1>
+                <p id="objText" class="text-[10px] text-slate-300 whitespace-nowrap truncate">خريطة المقاطعات</p>
+            </div>
+        </div>
+
+        <div id="scoreBoard" class="shrink-0 flex flex-nowrap items-center gap-1.5 bg-slate-800/80 px-2 py-1 rounded-xl border border-slate-700 text-[11px]"></div>
+
+        <button id="pauseBtn" title="إيقاف مؤقت (Esc)" class="shrink-0 px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-amber-300 text-xs md:text-sm font-semibold rounded-xl border border-slate-700 transition flex items-center cursor-pointer whitespace-nowrap"><svg class="ico" viewBox="0 0 384 512" fill="currentColor" aria-hidden="true"><path d="M48 32C21.5 32 0 53.5 0 80v352c0 26.5 21.5 48 48 48h64c26.5 0 48-21.5 48-48V80c0-26.5-21.5-48-48-48zm224 0c-26.5 0-48 21.5-48 48v352c0 26.5 21.5 48 48 48h64c26.5 0 48-21.5 48-48V80c0-26.5-21.5-48-48-48z"/></svg></button>
+        <button id="saveBtn" title="حفظ اللعبة" class="shrink-0 px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-emerald-300 text-xs md:text-sm font-semibold rounded-xl border border-slate-700 transition flex items-center gap-1.5 cursor-pointer whitespace-nowrap"><svg class="ico" viewBox="0 0 448 512" fill="currentColor" aria-hidden="true"><path d="M64 32C28.7 32 0 60.7 0 96v320c0 35.3 28.7 64 64 64h320c35.3 0 64-28.7 64-64V173.3c0-17-6.7-33.3-18.7-45.3L352 50.7c-12-12-28.3-18.7-45.3-18.7zm32 96c0-17.7 14.3-32 32-32h160c17.7 0 32 14.3 32 32v64c0 17.7-14.3 32-32 32H128c-17.7 0-32-14.3-32-32zm128 160a64 64 0 1 1 0 128 64 64 0 1 1 0-128"/></svg><span class="hidden sm:inline">حفظ</span></button>
+        <button id="restartBtn" title="إعادة من المستوى 1" class="shrink-0 px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs md:text-sm font-semibold rounded-xl border border-slate-700 transition flex items-center gap-1.5 cursor-pointer whitespace-nowrap">
+            <svg class="ico" viewBox="0 0 512 512" fill="currentColor" aria-hidden="true"><path d="M488 192H344c-9.7 0-18.5-5.8-22.2-14.8s-1.7-19.3 5.2-26.2l46.7-46.7C298.4 45.7 189.4 51 120.2 120.2c-75 75-75 196.5 0 271.5s196.5 75 271.5 0q12.3-12.3 21.9-26.1c10.1-14.5 30.1-18 44.6-7.9s18 30.1 7.9 44.6c-8.5 12.2-18.2 23.8-29.1 34.7-100 100-262.1 100-362 0S-25 175 75 75c94.3-94.3 243.7-99.6 344.3-16.2L471 7c6.9-6.9 17.2-8.9 26.2-5.2S512 14.3 512 24v144c0 13.3-10.7 24-24 24"/></svg><span class="hidden sm:inline">إعادة</span>
+        </button>
+    </header>
+
+    <!-- Main Canvas Area -->
+    <main id="mainArea" class="w-full flex-1 min-h-0 relative">
+        <canvas id="gameCanvas"></canvas>
+        </main>
+
+    <!-- Controls bar: خارج الخريطة، فلا يغطي بعضها بعضاً ولا يحجب الخريطة -->
+    <footer id="controls" class="shrink-0 w-full max-w-4xl px-2 pt-1.5 flex flex-wrap items-center justify-center gap-1.5 z-10 bg-slate-900/95 border-t border-slate-700/50" style="padding-bottom: max(6px, env(safe-area-inset-bottom));">
+        <div id="powerBar" class="flex items-center gap-0.5 p-0.5 rounded-xl bg-slate-800/80 border border-slate-700">
+            <button class="pwBtn px-2 py-1 rounded-lg text-[11px] font-bold transition cursor-pointer text-sky-300 flex items-center gap-1" data-p="freeze" title="تجميد الأعداء 5 ثوانٍ"><svg class="ico" viewBox="0 0 512 512" fill="currentColor" aria-hidden="true"><path d="M288.2 0c0-17.7-14.3-32-32-32s-32 14.3-32 32v62.1l-15-15c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9l49 49v70.6l-61.2-35.3-17.9-66.9c-3.4-12.8-16.6-20.4-29.4-17S95.3 98 98.7 110.8l5.5 20.5-53.7-31C35.2 91.5 15.6 96.7 6.8 112s-3.6 34.9 11.7 43.7l53.7 31-20.5 5.5c-12.8 3.4-20.4 16.6-17 29.4s16.6 20.4 29.4 17l66.9-17.9 61.2 35.3-61.2 35.3-66.9-17.9c-12.8-3.4-26 4.2-29.4 17s4.2 26 17 29.4l20.5 5.5-53.7 31C3.2 365.1-2 384.7 6.8 400s28.4 20.6 43.7 11.7l53.7-31-5.5 20.5c-3.4 12.8 4.2 26 17 29.4s26-4.2 29.4-17l17.9-66.9 61.2-35.3V382l-49 49c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l15-15V512c0 17.7 14.3 32 32 32s32-14.3 32-32v-62.1l15 15c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-49-49v-70.6l61.2 35.3 17.9 66.9c3.4 12.8 16.6 20.4 29.4 17s20.4-16.6 17-29.4l-5.5-20.5 53.7 31c15.3 8.8 34.9 3.6 43.7-11.7s3.6-34.9-11.7-43.7l-53.7-31 20.5-5.5c12.8-3.4 20.4-16.6 17-29.4s-16.6-20.4-29.4-17l-66.9 17.9L320 256l61.2-35.3 66.9 17.9c12.8 3.4 26-4.2 29.4-17s-4.2-26-17-29.4l-20.5-5.5 53.7-31c15.3-8.8 20.6-28.4 11.7-43.7s-28.4-20.5-43.7-11.7l-53.7 31 5.5-20.5c3.4-12.8-4.2-26-17-29.4s-26 4.2-29.4 17l-17.9 66.9-61.2 35.3V130l49-49c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-15 15V0z"/></svg><span id="pwc_freeze">0</span></button>
+            <button class="pwBtn px-2 py-1 rounded-lg text-[11px] font-bold transition cursor-pointer text-emerald-300 flex items-center gap-1" data-p="boost" title="نمو مضاعف لمقاطعاتك 10 ثوانٍ"><svg class="ico" viewBox="0 0 448 512" fill="currentColor" aria-hidden="true"><path d="M338.8-9.9c11.9 8.6 16.3 24.2 10.9 37.8L271.3 224H416c13.5 0 25.5 8.4 30.1 21.1s.7 26.9-9.6 35.5l-288 240c-11.3 9.4-27.4 9.9-39.3 1.3s-16.3-24.2-10.9-37.8L176.7 288H32c-13.5 0-25.5-8.4-30.1-21.1s-.7-26.9 9.6-35.5l288-240c11.3-9.4 27.4-9.9 39.3-1.3"/></svg><span id="pwc_boost">0</span></button>
+            <button class="pwBtn px-2 py-1 rounded-lg text-[11px] font-bold transition cursor-pointer text-rose-300 flex items-center gap-1" data-p="missile" title="صاروخ: يخصم 25 جندياً من مقاطعة تختارها"><svg class="ico" viewBox="0 0 512 512" fill="currentColor" aria-hidden="true"><path d="M128 320H24.5c-24.9 0-40.2-27.1-27.4-48.5L50 183.3c8.7-14.5 24.3-23.3 41.2-23.3h95C262.3 31.1 375.8 24.6 451.7 35.7c12.8 1.9 22.8 11.9 24.6 24.6 11.1 75.9 4.6 189.4-124.3 265.5v95c0 16.9-8.8 32.5-23.3 41.2l-88.2 52.9c-21.3 12.8-48.5-2.6-48.5-27.4V384c0-35.3-28.7-64-64-64h-.1zm272-160a48 48 0 1 0-96 0 48 48 0 1 0 96 0"/></svg><span id="pwc_missile">0</span></button>
+        </div>
+        <div class="flex items-center gap-0.5 p-0.5 rounded-xl bg-slate-800/80 border border-slate-700">
+            <button id="selectAllBtn" title="حدّد كل مقاطعاتك ثم اضغط هدفاً واحداً (استخدام واحد ثم يعود)" class="px-2 py-1 rounded-lg text-[11px] font-bold transition cursor-pointer text-amber-300 whitespace-nowrap">تحديد الكل</button>
+        </div>
+        <div class="flex items-center gap-0.5 p-0.5 rounded-xl bg-slate-800/80 border border-slate-700">
+            <button class="kindBtn px-2 py-1 rounded-lg text-[11px] font-bold transition cursor-pointer text-slate-300" data-k="prod" title="إنتاج: نمو ×2 لمقاطعاتك، لكن الجنود بطيئة وقوتهم عادية">إنتاج</button>
+            <button class="kindBtn px-2 py-1 rounded-lg text-[11px] font-bold transition cursor-pointer text-slate-300" data-k="fast" title="سريع: الإنتاج أبطأ، الجنود أسرع بكثير وقوتهم عادية">سريع</button>
+            <button class="kindBtn px-2 py-1 rounded-lg text-[11px] font-bold transition cursor-pointer text-slate-300" data-k="heavy" title="قوي: الإنتاج أبطأ والجنود بطيئة، لكن كل جندي بقيمة جنديين وصحته 3">قوي</button>
+        </div>
+        <div id="ratioBar" class="flex items-center gap-0.5 p-0.5 rounded-xl bg-slate-800/80 border border-slate-700">
+            <button class="ratioBtn px-2 py-1 rounded-lg text-[11px] font-bold transition cursor-pointer text-slate-300" data-r="0.25">25%</button>
+            <button class="ratioBtn px-2 py-1 rounded-lg text-[11px] font-bold transition cursor-pointer text-slate-300" data-r="0.5">50%</button>
+            <button class="ratioBtn px-2 py-1 rounded-lg text-[11px] font-bold transition cursor-pointer text-slate-300" data-r="1">100%</button>
+        </div>
+    </footer>
+
+    <!-- Start / Continue Modal -->
+    <div id="startModal" class="hidden fixed inset-0 z-[60] bg-slate-950/85 backdrop-blur-lg flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-3xl max-w-sm w-full text-center shadow-2xl space-y-5">
+            <div class="w-16 h-16 mx-auto rounded-3xl flex items-center justify-center text-3xl shadow-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                <svg class="ico" viewBox="0 0 448 512" fill="currentColor" aria-hidden="true"><path d="M64 32C28.7 32 0 60.7 0 96v320c0 35.3 28.7 64 64 64h320c35.3 0 64-28.7 64-64V173.3c0-17-6.7-33.3-18.7-45.3L352 50.7c-12-12-28.3-18.7-45.3-18.7zm32 96c0-17.7 14.3-32 32-32h160c17.7 0 32 14.3 32 32v64c0 17.7-14.3 32-32 32H128c-17.7 0-32-14.3-32-32zm128 160a64 64 0 1 1 0 128 64 64 0 1 1 0-128"/></svg>
+            </div>
+            <div>
+                <h2 class="text-xl md:text-2xl font-black text-white mb-2">لديك لعبة محفوظة</h2>
+                <p id="startSub" class="text-slate-400 text-xs md:text-sm leading-relaxed"></p>
+            </div>
+            <div class="space-y-2">
+                <button id="continueBtn" class="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl shadow-lg shadow-emerald-500/25 transition cursor-pointer">متابعة</button>
+                <button id="newGameBtn" class="w-full py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl border border-slate-700 transition cursor-pointer">البدء من جديد (المستوى 1)</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Difficulty Modal -->
+    <div id="diffModal" class="hidden fixed inset-0 z-[65] bg-slate-950/85 backdrop-blur-lg flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-3xl max-w-sm w-full text-center shadow-2xl space-y-5">
+            <div>
+                <h2 class="text-xl md:text-2xl font-black text-white mb-2">اختر مستوى الصعوبة</h2>
+                <p class="text-slate-400 text-xs md:text-sm leading-relaxed">سيستمر اللعب على هذا المستوى حتى تبدأ من جديد</p>
+            </div>
+            <div class="space-y-2">
+                <button class="diffBtn w-full py-3 text-white font-bold rounded-xl cursor-pointer" data-d="easy" style="background:#059669">سهل<span class="diffSub">الصعوبة الحالية</span></button>
+                <button class="diffBtn w-full py-3 text-white font-bold rounded-xl cursor-pointer" data-d="medium" style="background:#d97706">متوسط<span class="diffSub">أعداء أسرع وأقوى</span></button>
+                <button class="diffBtn w-full py-3 text-white font-bold rounded-xl cursor-pointer" data-d="hard" style="background:#dc2626">أصعب<span class="diffSub">تحدٍّ أكبر بقليل</span></button>
+                <button id="diffCancelBtn" class="hidden w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-semibold rounded-xl border border-slate-700 cursor-pointer">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pause Modal -->
+    <div id="pauseModal" class="hidden fixed inset-0 z-[55] bg-slate-950/80 backdrop-blur-lg flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-3xl max-w-sm w-full text-center shadow-2xl space-y-5">
+            <div class="w-16 h-16 mx-auto rounded-3xl flex items-center justify-center text-3xl shadow-xl bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                <svg class="ico" viewBox="0 0 384 512" fill="currentColor" aria-hidden="true"><path d="M48 32C21.5 32 0 53.5 0 80v352c0 26.5 21.5 48 48 48h64c26.5 0 48-21.5 48-48V80c0-26.5-21.5-48-48-48zm224 0c-26.5 0-48 21.5-48 48v352c0 26.5 21.5 48 48 48h64c26.5 0 48-21.5 48-48V80c0-26.5-21.5-48-48-48z"/></svg>
+            </div>
+            <div>
+                <h2 class="text-xl md:text-2xl font-black text-white mb-2">اللعبة متوقفة مؤقتاً</h2>
+                <p class="text-slate-400 text-xs md:text-sm">اضغط استئناف للمتابعة (أو Esc)</p>
+            </div>
+            <button id="resumeBtn" class="w-full py-3 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-xl shadow-lg shadow-amber-500/25 transition cursor-pointer">استئناف</button>
+        </div>
+    </div>
+
+    <div id="toast" class="fixed top-16 left-1/2 -translate-x-1/2 z-[70] px-4 py-2 rounded-xl bg-slate-800 border border-slate-600 text-sm text-white shadow-xl opacity-0 pointer-events-none transition-opacity duration-300"></div>
+
+    <!-- Game Over Modal -->
+    <div id="gameOverModal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-lg flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-3xl max-w-sm w-full text-center shadow-2xl space-y-6">
+            <div id="modalIcon" class="w-16 h-16 md:w-20 md:h-20 mx-auto rounded-3xl flex items-center justify-center text-3xl md:text-4xl shadow-xl"></div>
+            <div>
+                <h2 id="modalTitle" class="text-xl md:text-2xl font-black text-white mb-2"></h2>
+                <p id="modalSub" class="text-slate-400 text-xs md:text-sm"></p>
+            </div>
+            <button id="modalRestartBtn" class="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl shadow-lg shadow-blue-500/25 transition cursor-pointer">
+                التالي
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const mainArea = document.getElementById('mainArea');
+
+        const mapCanvas = document.createElement('canvas');
+        const mapCtx = mapCanvas.getContext('2d');
+        const CELL = 3;
+
+        let W = 0, H = 0;
+        let gw = 0, gh = 0;
+        let regionGrid = null;
+        let borderGrid = null;
+        let mapDirty = true;
+
+        const PLAYER_TEAM = { id: 'PLAYER', color: '#3b82f6', stroke: '#93c5fd' };
+        const NEUTRAL_TEAM = { id: 'NEUTRAL', color: '#64748b', stroke: '#94a3b8' };
+        const BOSS_TEAM = { id: 'BOSS', color: '#7f1d1d', stroke: '#fbbf24' };
+
+        const ENEMY_PALETTE = [
+            { id: 'ENEMY_1', color: '#ef4444', stroke: '#fca5a5' },
+            { id: 'ENEMY_2', color: '#10b981', stroke: '#6ee7b7' },
+            { id: 'ENEMY_3', color: '#f59e0b', stroke: '#fcd34d' },
+            { id: 'ENEMY_4', color: '#8b5cf6', stroke: '#c4b5fd' },
+            { id: 'ENEMY_5', color: '#ec4899', stroke: '#f9a8d4' }
+        ];
+
+        let currentLevel = 1;
+        let activeEnemies = [];
+        let nodes = [];
+        let troops = [];
+        let selectedNodes = [];
+        let hoverNode = null;
+        let pointer = { x: 0, y: 0 };
+        let isGameOver = true; // متوقفة حتى يبدأ اللاعب أو يتابع
+        let gameToken = 0;
+        let pendingCarry = null;  // جيش ينتقل للمستوى التالي {count, level}
+        let levelCarry = null;    // الجيش الذي بدأ به المستوى الحالي
+        let peakLevel = 1;        // أعلى مستوى ترقية وصلت إليه في المستوى الحالي
+        let sendRatio = 1;        // نسبة الجنود المرسلة (0.25 / 0.5 / 1)
+
+        // ===== الزمن واللعبة المتوقفة =====
+        let paused = false;
+        let gameTime = 0;         // ساعة اللعبة بالمللي ثانية (لا تتقدم أثناء الإيقاف)
+        let lastFrameTs = 0;
+        let growAcc = 0;          // مؤقت النمو (كل 1000ms)
+        let uiAcc = 0;            // مؤقت تحديث الحالة (5 مرات/ثانية)
+        let launches = [];        // دفعات الإرسال الجارية {from,to,team,remaining,acc}
+        let mapTimer = 0;
+        let scoreEls = { player: null, enemies: {}, last: {} };
+        let activeEnemyIds = new Set();
+
+        // ===== ميزات اللعب الجديدة =====
+        // قوة (power) وصحة (hp) وتكلفة بالجنود (cost) وسرعة لكل نوع جندي
+        const KIND = {
+            normal: { speed: 1.6, power: 1,   hp: 1, cost: 1, radius: 4.5, gap: 30 },
+            prod:   { speed: 1.0, power: 1,   hp: 1, cost: 1, radius: 4.5, gap: 45 },
+            fast:   { speed: 2.8, power: 1,   hp: 1, cost: 1, radius: 3.6, gap: 24 },
+            heavy:  { speed: 1.0, power: 2,   hp: 3, cost: 2, radius: 6.2, gap: 55 }
+        };
+        const PROD_MUL = { prod: 2, fast: 0.6, heavy: 0.6, normal: 1 }; // مضاعف إنتاج مقاطعات اللاعب حسب نوع الجنود
+        const KIND_BADGE = {
+            factory: { ch: 'ص', color: '#ea580c' },  // مصنع: نمو ×2
+            tower:   { ch: 'ب', color: '#0891b2' },  // برج: يكشف الخريطة
+            port:    { ch: 'م', color: '#0d9488' }   // ميناء: عبور البحيرات
+        };
+        const NODE_R = 13;   // نصف قطر المقاطعة (كان 19)
+        // ===== مستوى الصعوبة =====
+        // easy = الإعدادات الحالية السابقة، medium/hard أصعب تدريجياً
+        const DIFF = {
+            easy:   { label: 'سهل',   growth: 1.0,  ai: 1.0,  start: 0,  coop: 0,    extraAttack: 0, margin: 1.0 },
+            medium: { label: 'متوسط', growth: 1.3,  ai: 0.75, start: 8,  coop: 0.15, extraAttack: 0, margin: 0.92 },
+            hard:   { label: 'أصعب',  growth: 1.6,  ai: 0.55, start: 16, coop: 0.3,  extraAttack: 1, margin: 0.85 }
+        };
+        let difficulty = 'easy';
+        try { const dv = localStorage.getItem('stateio_diff'); if (DIFF[dv]) difficulty = dv; } catch (e) {}
+        function setDifficulty(d) {
+            difficulty = DIFF[d] ? d : 'easy';
+            try { localStorage.setItem('stateio_diff', difficulty); } catch (e) {}
+        }
+        function levelTitleText() { return `المستوى ${currentLevel} · ${DIFF[difficulty].label}`; }
+        let sendKind = 'prod';
+        let powerups = { freeze: 0, boost: 0, missile: 0 };
+        let levelStartPw = { freeze: 0, boost: 0, missile: 0 };
+        let freezeUntil = 0, boostUntil = 0;
+        let missileMode = false;
+        let sticky = [];            // تحديد دائم (زر تحديد الكل)
+        let lakes = [];             // بحيرات {nx,ny,nrx,nry} بإحداثيات نسبية
+        let fogOn = false;
+        let visibleSet = new Set();
+        let objective = { type: 'conquer' };
+        let threatMap = new Map();
+
+        function hexToRgb(hex) {
+            const n = parseInt(hex.slice(1), 16);
+            return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+        }
+
+        function resizeCanvas() {
+            const nw = Math.max(1, Math.floor(mainArea.clientWidth));
+            const nh = Math.max(1, Math.floor(mainArea.clientHeight));
+            if (nw === W && nh === H) return;
+            const oldW = W, oldH = H;
+            W = nw;
+            H = nh;
+            canvas.width = W;
+            canvas.height = H;
+            if (nodes.length && oldW && oldH) {
+                nodes.forEach(n => { n.x = n.nx * W; n.y = n.ny * H; });
+                troops.forEach(t => { t.x *= W / oldW; t.y *= H / oldH; });
+                // الخريطة القديمة تُمدّد مؤقتاً أثناء السحب، والبناء الفعلي بعد استقرار الحجم
+                clearTimeout(mapTimer);
+                mapTimer = setTimeout(buildMap, 150);
+            }
+        }
+        new ResizeObserver(resizeCanvas).observe(mainArea);
+        window.addEventListener('resize', resizeCanvas);
+
+        class Node {
+            constructor(id, nx, ny, team, count) {
+                this.id = id;
+                this.nx = nx;
+                this.ny = ny;
+                this.x = nx * W;
+                this.y = ny * H;
+                this.radius = NODE_R;
+                this.team = team;
+                this.count = count;
+                this.maxCount = 100; // ثابت لكل المقاطعات (الترقية لا ترفعه)
+                this.adj = [];
+                this.level = 1;
+                this.isCannon = false;
+                this.isFortress = false;
+                this.aimAngle = Math.random() * Math.PI * 2;
+                this.lastShot = 0;
+                this.kind = null;       // factory | tower | port
+                this.isTarget = false;  // هدف مرحلة "احتل"
+            }
+
+            upgradeCost() { return 20 + (this.level - 1) * 10; }
+
+            upgrade() {
+                const top = this.y - this.radius - 10;
+                if (this.level >= MAX_LEVEL) {
+                    addFloatText(this.x, top, 'أقصى مستوى', '#fbbf24');
+                    return;
+                }
+                const cost = this.upgradeCost();
+                if (this.count < cost) {
+                    addFloatText(this.x, top, `تحتاج ${cost} جندي`, '#fca5a5');
+                    return;
+                }
+                this.count -= cost;
+                this.level++;
+                if (this.team === PLAYER_TEAM && this.level > peakLevel) peakLevel = this.level;
+                addFloatText(this.x, top, 'ترقية!', '#86efac');
+            }
+
+            draw() {
+                const isSelected = selectedNodes.includes(this) || sticky.includes(this);
+                if (isSelected) {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.radius + 5, 0, Math.PI * 2);
+                    ctx.strokeStyle = '#f59e0b';
+                    ctx.lineWidth = 3.5;
+                    ctx.setLineDash([6, 5]);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                } else if (hoverNode === this && selectedNodes.length > 0) {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.radius + 5, 0, Math.PI * 2);
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.lineWidth = 3;
+                    ctx.setLineDash([4, 4]);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                }
+
+                // حلقة تحذير وامضة على مقاطعاتك المهددة بجيش قادم
+                const incoming = this.team === PLAYER_TEAM ? (threatMap.get(this) || 0) : 0;
+                if (incoming > 0) {
+                    const danger = incoming >= this.count;
+                    const pulse = 0.5 + 0.5 * Math.sin(gameTime / (danger ? 90 : 170));
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.radius + 7 + pulse * 2.5, 0, Math.PI * 2);
+                    ctx.strokeStyle = danger ? '#ef4444' : '#fb923c';
+                    ctx.lineWidth = 3;
+                    ctx.globalAlpha = 0.3 + 0.7 * pulse;
+                    ctx.stroke();
+                    ctx.globalAlpha = 1;
+                }
+
+                if (this.isCannon) {
+                    // دائرة المدى
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, cannonRange(), 0, Math.PI * 2);
+                    ctx.globalAlpha = 0.35;
+                    ctx.strokeStyle = this.team.stroke;
+                    ctx.lineWidth = 1.5;
+                    ctx.setLineDash([3, 7]);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                    ctx.globalAlpha = 1;
+
+                    // ماسورة المدفع
+                    ctx.save();
+                    ctx.translate(this.x, this.y);
+                    ctx.rotate(this.aimAngle);
+                    ctx.fillStyle = '#0f172a';
+                    ctx.fillRect(0, -3, this.radius + 8, 6);
+                    ctx.strokeStyle = 'rgba(255,255,255,0.9)';
+                    ctx.lineWidth = 1.5;
+                    ctx.strokeRect(0, -3, this.radius + 8, 6);
+                    ctx.restore();
+                }
+
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.team.color;
+                ctx.fill();
+                ctx.lineWidth = 2.5;
+                ctx.strokeStyle = 'rgba(255,255,255,0.9)';
+                ctx.stroke();
+
+                if (this.isFortress) {
+                    // شرفات القلعة حول الدائرة + حلقة داخلية
+                    ctx.fillStyle = 'rgba(255,255,255,0.95)';
+                    for (let i = 0; i < 8; i++) {
+                        const a = i * Math.PI / 4;
+                        ctx.save();
+                        ctx.translate(this.x + Math.cos(a) * (this.radius + 1.5), this.y + Math.sin(a) * (this.radius + 1.5));
+                        ctx.rotate(a);
+                        ctx.fillRect(-2, -2, 4, 4);
+                        ctx.restore();
+                    }
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.radius - 4, 0, Math.PI * 2);
+                    ctx.lineWidth = 2;
+                    ctx.strokeStyle = 'rgba(255,255,255,0.6)';
+                    ctx.stroke();
+                }
+
+                if (this.isCannon) {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.radius - 4.5, 0, Math.PI * 2);
+                    ctx.lineWidth = 2;
+                    ctx.strokeStyle = 'rgba(0,0,0,0.35)';
+                    ctx.stroke();
+                }
+
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 11px Cairo, Tahoma, "Segoe UI", Arial, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                const vis = isVisible(this);
+                if (!vis) { // ضباب: لا ترى عدد الجنود
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(2,6,23,0.45)';
+                    ctx.fill();
+                    ctx.fillStyle = '#ffffff';
+                }
+                ctx.fillText(vis ? Math.floor(this.count) : '?', this.x, this.y + 1);
+
+                // نقاط المستوى
+                if (this.level > 1) {
+                    for (let i = 0; i < this.level; i++) {
+                        ctx.beginPath();
+                        ctx.arc(this.x + (i - (this.level - 1) / 2) * 5.5, this.y + this.radius + 6, 2, 0, Math.PI * 2);
+                        ctx.fillStyle = '#fde047';
+                        ctx.fill();
+                    }
+                }
+
+                this.drawExtras();
+
+                // سهم أخضر يظهر عندما تستطيع ترقية مقاطعتك
+                if (this.team === PLAYER_TEAM && this.level < MAX_LEVEL && this.count >= this.upgradeCost()) {
+                    ctx.beginPath();
+                    ctx.moveTo(this.x, this.y - this.radius - 11);
+                    ctx.lineTo(this.x - 4, this.y - this.radius - 5);
+                    ctx.lineTo(this.x + 4, this.y - this.radius - 5);
+                    ctx.closePath();
+                    ctx.fillStyle = '#4ade80';
+                    ctx.fill();
+                }
+            }
+
+            // علامات إضافية: هدف المرحلة، الزعيم، شارة النوع، وعلامة التحذير
+            drawExtras() {
+                if (this.isTarget && objective.type === 'capture') {
+                    const pulse = 0.5 + 0.5 * Math.sin(gameTime / 250);
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.radius + 4 + pulse * 1.5, 0, Math.PI * 2);
+                    ctx.strokeStyle = '#fbbf24';
+                    ctx.lineWidth = 2.5;
+                    ctx.stroke();
+                    ctx.fillStyle = '#fbbf24';
+                    ctx.font = 'bold 13px Cairo, Tahoma, "Segoe UI", Arial, sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText('★', this.x, this.y - this.radius - 16);
+                }
+                if (this.team === BOSS_TEAM) {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.radius + 3, 0, Math.PI * 2);
+                    ctx.strokeStyle = '#fbbf24';
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                }
+                if (this.kind && isVisible(this)) {
+                    const info = KIND_BADGE[this.kind];
+                    const bx = this.x + this.radius * 0.8, by = this.y - this.radius * 0.8;
+                    ctx.beginPath();
+                    ctx.arc(bx, by, 6.5, 0, Math.PI * 2);
+                    ctx.fillStyle = info.color;
+                    ctx.fill();
+                    ctx.lineWidth = 1.5;
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.stroke();
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = 'bold 8.5px Cairo, Tahoma, "Segoe UI", Arial, sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(info.ch, bx, by + 1);
+                }
+                if (this.team === PLAYER_TEAM && threatMap.get(this) > 0) {
+                    ctx.fillStyle = '#ef4444';
+                    ctx.font = 'bold 13px Cairo, Tahoma, "Segoe UI", Arial, sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText('!', this.x, this.y - this.radius - 16);
+                }
+            }
+
+            grow() {
+                if (this.team === NEUTRAL_TEAM || this.count >= this.maxCount) return;
+                let rate = 0.4 * this.level;
+                if (this.kind === 'factory') rate *= 2;
+                if (this.isFortress && this.team !== BOSS_TEAM) rate *= 0.5;
+                if (this.team === PLAYER_TEAM) {
+                    if (gameTime < boostUntil) rate *= 2;
+                    rate *= PROD_MUL[sendKind] || 1;
+                } else {
+                    if (gameTime < freezeUntil) return; // الأعداء متجمدون
+                    rate *= enemyGrowthMul(this.team);
+                }
+                this.count = Math.min(this.maxCount, this.count + rate);
+            }
+        }
+
+        function buildMap() {
+            clearTimeout(mapTimer);
+            gw = Math.ceil(W / CELL);
+            gh = Math.ceil(H / CELL);
+            mapCanvas.width = gw;
+            mapCanvas.height = gh;
+            regionGrid = new Int16Array(gw * gh);
+            borderGrid = new Uint8Array(gw * gh);
+
+            const seeds = nodes.map(n => ({ x: n.nx * gw, y: n.ny * gh }));
+            const mx = gw * 0.03;
+            const my = gh * 0.03;
+
+            for (let gy = 0; gy < gh; gy++) {
+                for (let gx = 0; gx < gw; gx++) {
+                    // التشويه بإحداثيات نسبية (0..1) فيبقى شكل الحدود ثابتاً مهما تغيّر حجم الشاشة
+                    const u = gx / gw, v = gy / gh;
+                    const wx = gx + gw * (0.020 * Math.sin(v * 22) + 0.012 * Math.sin(v * 62 + 2));
+                    const wy = gy + gh * (0.012 * Math.sin(u * 12 + 1) + 0.007 * Math.sin(u * 35));
+                    const idx = gy * gw + gx;
+
+                    if (wx < mx || wx > gw - mx || wy < my || wy > gh - my) {
+                        regionGrid[idx] = -1;
+                        continue;
+                    }
+                    let best = 0, bestD = Infinity;
+                    for (let s = 0; s < seeds.length; s++) {
+                        const dx = wx - seeds[s].x;
+                        const dy = wy - seeds[s].y;
+                        const d = dx * dx + dy * dy;
+                        if (d < bestD) { bestD = d; best = s; }
+                    }
+                    regionGrid[idx] = best;
+                }
+            }
+
+            const adjSets = nodes.map(() => new Set());
+            const dirs = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+            for (let gy = 0; gy < gh; gy++) {
+                for (let gx = 0; gx < gw; gx++) {
+                    const idx = gy * gw + gx;
+                    const id = regionGrid[idx];
+                    if (id < 0) continue;
+                    for (const [dx, dy] of dirs) {
+                        const nx = gx + dx, ny = gy + dy;
+                        const nid = (nx < 0 || ny < 0 || nx >= gw || ny >= gh) ? -1 : regionGrid[ny * gw + nx];
+                        if (nid !== id) {
+                            borderGrid[idx] = 1;
+                            if (nid >= 0) adjSets[id].add(nid);
+                        }
+                    }
+                }
+            }
+            nodes.forEach((n, i) => { n.adj = [...adjSets[i]].map(j => nodes[j]); });
+            mapDirty = true;
+        }
+
+        function renderMap() {
+            if (!regionGrid) return;
+            const img = mapCtx.createImageData(gw, gh);
+            const d = img.data;
+
+            const fills = nodes.map((n, i) => {
+                const base = hexToRgb(n.team.color);
+                const shade = 0.82 + ((i * 7) % 5) * 0.045;
+                return base.map(c => Math.min(255, Math.round(c * shade)));
+            });
+
+            for (let i = 0; i < regionGrid.length; i++) {
+                const id = regionGrid[i];
+                const o = i * 4;
+                if (id < 0) { d[o + 3] = 0; continue; }
+                const f = fills[id];
+                if (borderGrid[i]) {
+                    d[o] = f[0] * 0.42;
+                    d[o + 1] = f[1] * 0.42;
+                    d[o + 2] = f[2] * 0.42;
+                } else {
+                    d[o] = f[0];
+                    d[o + 1] = f[1];
+                    d[o + 2] = f[2];
+                }
+                d[o + 3] = 255;
+            }
+            mapCtx.putImageData(img, 0, 0);
+        }
+
+        class Troop {
+            constructor(path, team, kind = 'normal', ship = false) {
+                const K = KIND[kind] || KIND.normal;
+                this.kind = KIND[kind] ? kind : 'normal';
+                this.ship = ship;           // سفينة: تعبر البحيرات
+                this.power = K.power;
+                this.hp = K.hp;
+                this.cost = K.cost;
+                this.path = path;
+                this.step = 1;
+                this.team = team;
+                this.x = path[0].x + (Math.random() - 0.5) * 10;
+                this.y = path[0].y + (Math.random() - 0.5) * 10;
+                this.speed = K.speed;
+                this.radius = K.radius;
+                this.reached = false;
+                this.dead = false;
+                this.vx = 0;
+                this.vy = 0;
+            }
+
+            // k = عدد "فريمات 60Hz" المنقضية (يجعل السرعة ثابتة على كل الشاشات)
+            update(k = 1) {
+                const target = this.path[this.step];
+                const last = this.step === this.path.length - 1;
+                const dx = target.x - this.x;
+                const dy = target.y - this.y;
+                const dist = Math.hypot(dx, dy);
+                const limit = last ? target.radius : 6;
+
+                if (dist < limit) {
+                    if (last) {
+                        this.reached = true;
+                        this.onReach();
+                    } else {
+                        this.step++;
+                    }
+                } else {
+                    this.vx = (dx / dist) * this.speed;
+                    this.vy = (dy / dist) * this.speed;
+                    this.x += this.vx * k;
+                    this.y += this.vy * k;
+                }
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.team.color;
+                ctx.fill();
+                ctx.lineWidth = this.kind === 'heavy' ? 2.5 : 2;
+                ctx.strokeStyle = this.ship ? '#7dd3fc' : '#ffffff';
+                ctx.stroke();
+                if (this.kind === 'heavy') {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.radius * 0.4, 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(15,23,42,0.85)';
+                    ctx.fill();
+                }
+            }
+
+            onReach() {
+                const node = this.path[this.path.length - 1];
+                if (node.team === this.team) {
+                    node.count += this.cost;
+                } else {
+                    node.count -= this.power * (node.isFortress ? 1 / 1.5 : 1); // القلعة تحتاج مرة ونصف من عدد جنودها
+                    if (node.team === PLAYER_TEAM && this.team !== PLAYER_TEAM && node.count > 0) playSfx('repel');
+                    if (node.count <= 0) {
+                        node.team = this.team;
+                        node.count = 1;
+                        node.level = 1; // المقاطعة المحتلة ترجع للمستوى 1
+                        mapDirty = true;
+                    }
+                }
+            }
+        }
+
+        // ===== الترقية والمدافع والمؤثرات =====
+        const MAX_LEVEL = 5;
+        const CANNON_RELOAD = 450;   // مللي ثانية بين كل قذيفة
+        const SHELL_SPEED = 7;       // بكسل لكل فريم
+        let shells = [];
+        let fx = [];
+        let downPoint = { x: 0, y: 0 };
+        let downTime = 0;
+        const LONG_PRESS_MS = 450;
+
+        function cannonRange() {
+            return Math.max(110, Math.min(W, H) * 0.28);
+        }
+
+        // كل مستوى يسرّع الإطلاق: المستوى 1 = 450ms ... المستوى 5 ≈ 188ms
+        function cannonReload(n) {
+            return CANNON_RELOAD / (1 + 0.35 * (n.level - 1));
+        }
+
+        function addFloatText(x, y, text, color) {
+            fx.push({ kind: 'text', x, y, text, color, life: 1 });
+        }
+
+        function updateAndDrawFx(k = 1) {
+            for (const f of fx) {
+                f.life -= (f.kind === 'ring' ? 0.08 : 0.02) * k;
+                if (f.life <= 0) continue;
+                ctx.globalAlpha = Math.max(0, f.life);
+                if (f.kind === 'ring') {
+                    ctx.beginPath();
+                    ctx.arc(f.x, f.y, Math.max(1, 4 + (1 - Math.min(1, f.life)) * 14), 0, Math.PI * 2);
+                    ctx.strokeStyle = f.color;
+                    ctx.lineWidth = 2.5;
+                    ctx.stroke();
+                } else {
+                    f.y -= 0.5 * k;
+                    ctx.fillStyle = f.color;
+                    ctx.font = 'bold 13px Cairo, Tahoma, "Segoe UI", Arial, sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(f.text, f.x, f.y);
+                }
+            }
+            ctx.globalAlpha = 1;
+            fx = fx.filter(f => f.life > 0);
+        }
+
+        // تصويب مع تقدير موضع الجندي المتحرك (القذيفة نفسها تسير في خط مستقيم)
+        function aimAt(sx, sy, t, speed) {
+            let px = t.x, py = t.y;
+            for (let i = 0; i < 2; i++) {
+                const time = Math.hypot(px - sx, py - sy) / speed;
+                px = t.x + t.vx * time;
+                py = t.y + t.vy * time;
+            }
+            return { x: px, y: py };
+        }
+
+        class Shell {
+            constructor(x, y, ang, team, maxDist) {
+                this.x = x;
+                this.y = y;
+                this.vx = Math.cos(ang) * SHELL_SPEED;
+                this.vy = Math.sin(ang) * SHELL_SPEED;
+                this.team = team;
+                this.traveled = 0;
+                this.maxDist = maxDist;
+                this.radius = 3.5;
+                this.dead = false;
+            }
+
+            update(k = 1) {
+                // خطوات جزئية حتى لا تخترق القذيفة الجنود عند الفريمات الطويلة
+                const steps = Math.max(1, Math.ceil(k));
+                const kk = k / steps;
+                for (let s = 0; s < steps; s++) {
+                    this.x += this.vx * kk;
+                    this.y += this.vy * kk;
+                    this.traveled += SHELL_SPEED * kk;
+                    for (const t of troops) {
+                        if (t.dead || t.team === this.team) continue;
+                        if (Math.hypot(t.x - this.x, t.y - this.y) <= t.radius + this.radius + 2) {
+                            t.hp -= 1; // القذيفة تخصم نقطة صحة (الثقيل يتحمل أكثر)
+                            if (t.hp <= 1e-6) t.dead = true;
+                            this.dead = true;
+                            fx.push({ kind: 'ring', x: t.x, y: t.y, color: t.team.color, life: 1 });
+                            return;
+                        }
+                    }
+                    if (this.traveled >= this.maxDist) { this.dead = true; return; }
+                }
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.moveTo(this.x - this.vx * 2.5, this.y - this.vy * 2.5);
+                ctx.lineTo(this.x, this.y);
+                ctx.strokeStyle = 'rgba(253,224,71,0.7)';
+                ctx.lineWidth = 2.5;
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = '#fde047';
+                ctx.fill();
+                ctx.lineWidth = 1.5;
+                ctx.strokeStyle = '#1e293b';
+                ctx.stroke();
+            }
+        }
+
+        // كل مدفع يطلق على أقرب جندي لا ينتمي لصاحب المدفع (المحايد يطلق على الجميع)
+        function updateCannons(now) {
+            if (isGameOver) return;
+            const range = cannonRange();
+            for (const n of nodes) {
+                if (!n.isCannon || now - n.lastShot < cannonReload(n)) continue;
+                if (gameTime < freezeUntil && n.team !== PLAYER_TEAM && n.team !== NEUTRAL_TEAM) continue; // مدافع الأعداء متجمدة
+                let best = null, bestD = range;
+                for (const t of troops) {
+                    if (t.dead || t.team === n.team) continue;
+                    const d = Math.hypot(t.x - n.x, t.y - n.y);
+                    if (d < bestD) { bestD = d; best = t; }
+                }
+                if (!best) continue;
+                const aim = aimAt(n.x, n.y, best, SHELL_SPEED);
+                const ang = Math.atan2(aim.y - n.y, aim.x - n.x);
+                n.aimAngle = ang;
+                n.lastShot = now;
+                shells.push(new Shell(
+                    n.x + Math.cos(ang) * (n.radius + 6),
+                    n.y + Math.sin(ang) * (n.radius + 6),
+                    ang, n.team, range + 40
+                ));
+            }
+        }
+
+        function findPath(from, to) {
+            if (from === to) return [from];
+            const prev = new Map([[from, null]]);
+            const queue = [from];
+            while (queue.length) {
+                const cur = queue.shift();
+                if (cur === to) break;
+                for (const nb of cur.adj) {
+                    if (!prev.has(nb)) {
+                        prev.set(nb, cur);
+                        queue.push(nb);
+                    }
+                }
+            }
+            if (!prev.has(to)) return [from, to];
+            const path = [];
+            for (let n = to; n; n = prev.get(n)) path.unshift(n);
+            return path;
+        }
+
+        function initGame(level = 1, noSave = false) {
+            gameToken++;
+            currentLevel = level;
+            if (level > best.level) best.level = level;
+            nodes = [];
+            troops = [];
+            shells = [];
+            fx = [];
+            launches = [];
+            gameTime = 0;
+            growAcc = 0;
+            uiAcc = 0;
+            freezeUntil = 0;
+            boostUntil = 0;
+            missileMode = false;
+            sticky = [];
+            lakes = [];
+            threatMap = new Map();
+            if (level === 1 && !noSave) powerups = { freeze: 0, boost: 0, missile: 0 }; // بداية جديدة = بلا مهارات
+            levelStartPw = { ...powerups };
+            selectedNodes = [];
+            hoverNode = null;
+            isGameOver = false;
+            setPaused(false);
+            document.getElementById('gameOverModal').classList.add('hidden');
+            document.getElementById('levelTitle').innerText = levelTitleText();
+
+            // نوع المرحلة: كل خامسة زعيم، والباقي يدور بين أربعة أهداف
+            const isBoss = currentLevel % 5 === 0;
+            const objType = isBoss ? 'boss' : ['conquer', 'capture', 'survive', 'timed'][(currentLevel - 1) % 4];
+            let enemyCount = Math.min(currentLevel, 5);
+            if (isBoss) enemyCount = Math.max(1, enemyCount - 2);
+            else if (objType === 'timed') enemyCount = Math.max(1, enemyCount - 1);
+            activeEnemies = ENEMY_PALETTE.slice(0, enemyCount);
+            if (isBoss) activeEnemies = activeEnemies.concat([BOSS_TEAM]);
+            fogOn = currentLevel >= 3;
+            activeEnemyIds = new Set(activeEnemies.map(e => e.id));
+            assignAIProfiles();
+            updateScoreBoardUI();
+            resizeCanvas();
+
+            const cellSize = Math.max(100, Math.sqrt((W * H) / 28));
+            const cols = Math.max(4, Math.round(W / cellSize));
+            const rows = Math.max(5, Math.round(H / cellSize));
+
+            const spread = (n, k) => {
+                const out = [];
+                for (let i = 0; i < k; i++) out.push(Math.min(n - 1, Math.round((i + 0.5) * n / k - 0.5)));
+                return out;
+            };
+
+            const playerKey = `${rows - 1},${Math.floor(cols / 2)}`;
+
+            const enemyMap = {};
+            const e = activeEnemies.length;
+            if (e <= cols) {
+                spread(cols, e).forEach((c, i) => { enemyMap[`0,${c}`] = activeEnemies[i]; });
+            } else {
+                for (let c = 0; c < cols; c++) enemyMap[`0,${c}`] = activeEnemies[c];
+                spread(cols, e - cols).forEach((c, i) => { enemyMap[`1,${c}`] = activeEnemies[cols + i]; });
+            }
+
+            let id = 0;
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    const jx = (Math.random() - 0.5) * 0.44;
+                    const jy = (Math.random() - 0.5) * 0.44;
+                    const nx = 0.03 + 0.94 * (c + 0.5 + jx) / cols;
+                    const ny = 0.03 + 0.94 * (r + 0.5 + jy) / rows;
+                    const key = `${r},${c}`;
+
+                    let team = NEUTRAL_TEAM;
+                    // أعداد بدئية أكبر مع المراحل (العدو والمحايد)
+                    let count = 8 + Math.floor(Math.random() * 9) + Math.min(10, Math.floor(currentLevel / 2));
+                    if (key === playerKey) { team = PLAYER_TEAM; count = 35; }
+                    else if (enemyMap[key]) { team = enemyMap[key]; count = 25 + Math.min(30, (currentLevel - 1) * 3) + DIFF[difficulty].start; }
+
+                    const nd = new Node(id++, nx, ny, team, count);
+                    nd.row = r; // الصف يُحفظ لأن حذف مقاطعة للبحيرة يغيّر الترقيم
+                    nodes.push(nd);
+                }
+            }
+
+            // المدافع المحايدة: في الصفوف الوسطى فقط، وعددها يزيد مع المستوى
+            // البحيرات والموانئ أولاً: على الخرائط الصغيرة لا يبقى محايد كافٍ إن وُضعت بعد المدافع والقلاع
+            placeLakes();
+            placePorts();
+
+            const cannonCount = Math.min(2 + Math.floor((currentLevel - 1) / 2), 6);
+            const candidates = nodes.filter(n => {
+                return n.team === NEUTRAL_TEAM && !n.kind && n.row >= 1 && n.row <= rows - 2;
+            });
+            for (let i = candidates.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [candidates[i], candidates[j]] = [candidates[j], candidates[i]];
+            }
+            candidates.slice(0, cannonCount).forEach(n => {
+                n.isCannon = true;
+                n.count = 18;
+            });
+
+            // القلاع المحايدة: في الصفوف الوسطى أيضاً، وعددها يزيد مع المستوى
+            const fortCount = Math.min(1 + Math.floor(currentLevel / 2), 4);
+            candidates.slice(cannonCount, cannonCount + fortCount).forEach(n => {
+                n.isFortress = true;
+                n.count = 20;
+            });
+
+            // المصانع (نمو ×2) من المرحلة 2، والأبراج (كشف الخريطة) مع الضباب من المرحلة 3
+            let cursor = cannonCount + fortCount;
+            const take = (k) => { const out = candidates.slice(cursor, cursor + k); cursor += out.length; return out; };
+            if (currentLevel >= 2) take(Math.min(3, 1 + Math.floor(currentLevel / 4))).forEach(n => { n.kind = 'factory'; n.count = Math.max(n.count, 15); });
+            if (fogOn) take(currentLevel >= 8 ? 2 : 1).forEach(n => { n.kind = 'tower'; });
+
+            // الزعيم: عاصمة محصنة بجيش كبير ومستوى ترقية مرتفع
+            nodes.filter(n => n.team === BOSS_TEAM).forEach(n => { n.count = 70; n.level = 3; n.isFortress = true; });
+
+            // هدف المرحلة
+            objective = { type: objType };
+            if (objType === 'capture') {
+                const pool = nodes.filter(n => n.team === NEUTRAL_TEAM && !n.isCannon && !n.kind && n.ny < 0.5)
+                    .sort((a, b) => Math.hypot(a.nx - 0.5, a.ny - 0.12) - Math.hypot(b.nx - 0.5, b.ny - 0.12));
+                const tg = pool.length ? pool[Math.floor(Math.random() * Math.min(3, pool.length))] : null;
+                if (tg) { tg.isTarget = true; tg.isFortress = true; tg.count = 30; }
+                else objective.type = 'conquer';
+            } else if (objType === 'survive') {
+                objective.endAt = (150 + Math.min(currentLevel, 12) * 10) * 1000;
+            } else if (objType === 'timed') {
+                objective.endAt = (130 + 35 * activeEnemies.length) * 1000;
+            }
+
+            // نقل الجيش من المستوى السابق: نفس العدد في مقاطعة واحدة وبأعلى مستوى ترقية
+            levelCarry = (level > 1) ? pendingCarry : null;
+            pendingCarry = null;
+            peakLevel = 1;
+            if (levelCarry) {
+                const pn = nodes.find(n => n.team === PLAYER_TEAM);
+                if (pn) {
+                    pn.level = Math.max(1, Math.min(MAX_LEVEL, levelCarry.level));
+                    if (levelCarry.nodes && levelCarry.nodes.length) {
+                        const spec = levelCarry.nodes;
+                        pn.level = Math.max(1, Math.min(MAX_LEVEL, spec[0].l));
+                        levelCarry = { ...levelCarry, count: spec[0].c };
+                        if (spec[1]) {
+                            const second = nodes
+                                .filter(n => n.team === NEUTRAL_TEAM && !n.isCannon && !n.isFortress && !n.kind && !n.isTarget)
+                                .sort((a, b) => Math.hypot(a.x - pn.x, a.y - pn.y) - Math.hypot(b.x - pn.x, b.y - pn.y))[0];
+                            if (second) {
+                                second.team = PLAYER_TEAM;
+                                second.level = Math.max(1, Math.min(MAX_LEVEL, spec[1].l));
+                                second.count = Math.min(second.maxCount, spec[1].c);
+                            }
+                        }
+                    }
+                    pn.count = Math.min(pn.maxCount, Math.max(pn.count, levelCarry.count));
+                    peakLevel = pn.level;
+                    addFloatText(pn.x, pn.y - pn.radius - 24, 'جيشك انتقل معك', '#86efac');
+                }
+            }
+
+            buildMap();
+            updatePowerUI();
+            updateToolbarUI();
+            updateObjectiveUI();
+            if (!noSave) {
+                showToast(isBoss ? 'مرحلة الزعيم! ' + objectiveText() : objectiveText());
+                saveGame();
+            }
+        }
+
+        function updateScoreBoardUI() {
+            const board = document.getElementById('scoreBoard');
+            let html = `
+                <div class="flex items-center gap-1">
+                    <span class="w-2.5 h-2.5 rounded-full bg-blue-500 animate-pulse"></span>
+                    <span id="playerScore" class="font-bold text-blue-400">0</span>
+                </div>
+            `;
+            activeEnemies.forEach(enemy => {
+                html += `
+                    <div class="flex items-center gap-1">
+                        <span class="w-2.5 h-2.5 rounded-full" style="background-color: ${enemy.color}"></span>
+                        <span id="score_${enemy.id}" class="font-bold" style="color: ${enemy.stroke}">0</span>
+                    </div>
+                `;
+            });
+            board.innerHTML = html;
+            // تخزين العناصر مرة واحدة بدل getElementById في كل تحديث
+            scoreEls = { player: document.getElementById('playerScore'), enemies: {}, last: {} };
+            activeEnemies.forEach(enemy => { scoreEls.enemies[enemy.id] = document.getElementById(`score_${enemy.id}`); });
+        }
+
+        // إرسال الجنود: تُجدول كدفعة تخرج جنودها تباعاً من ساعة اللعبة (تتوقف مع الإيقاف وتُحفظ)
+        // kind: عادي (قوة 1) / سريع (أسرع لكن قوته 70%) / ثقيل (جندي بقيمة جنديين، صحته 3، أبطأ)
+        function sendTroops(fromNode, toNode, ratio = 1, kind = 'normal') {
+            if (fromNode === toNode || fromNode.count < 1) return false;
+            if (!KIND[kind]) kind = 'normal';
+            const K = KIND[kind];
+
+            const sendAmount = ratio >= 1 ? Math.floor(fromNode.count) : Math.max(1, Math.floor(fromNode.count * ratio));
+            let n = sendAmount, spent = sendAmount;
+            if (K.cost > 1) {
+                n = Math.floor(sendAmount / K.cost);
+                if (n < 1) return false;
+                spent = n * K.cost;
+            }
+            fromNode.count = (ratio >= 1 && K.cost === 1) ? 0 : fromNode.count - spent; // الباقي يبقى في المقاطعة
+
+            // مسار مستقيم مباشر؛ والجنود الخارجون من ميناء يعبرون البحيرات كسفن
+            launches.push({ from: fromNode, to: toNode, team: fromNode.team, remaining: n, kind, ship: fromNode.kind === 'port', acc: 0 });
+            return true;
+        }
+
+        function updateLaunches(dt) {
+            const frozen = gameTime < freezeUntil;
+            for (const l of launches) {
+                if (frozen && l.team !== PLAYER_TEAM) continue;
+                const gap = KIND[l.kind].gap;
+                l.acc += dt;
+                while (l.acc >= gap && l.remaining > 0) {
+                    l.acc -= gap;
+                    troops.push(new Troop([l.from, l.to], l.team, l.kind, l.ship));
+                    l.remaining--;
+                }
+            }
+            launches = launches.filter(l => l.remaining > 0);
+        }
+
+        function toCanvasPoint(e) {
+            const rect = canvas.getBoundingClientRect();
+            return {
+                x: (e.clientX - rect.left) * (canvas.width / rect.width),
+                y: (e.clientY - rect.top) * (canvas.height / rect.height)
+            };
+        }
+
+        function nodeAt(x, y) {
+            const gx = Math.floor(x / CELL);
+            const gy = Math.floor(y / CELL);
+            if (regionGrid && gx >= 0 && gy >= 0 && gx < gw && gy < gh) {
+                const id = regionGrid[gy * gw + gx];
+                if (id >= 0) return nodes[id];
+            }
+            return nodes.find(n => Math.hypot(n.x - x, n.y - y) <= n.radius + 8) || null;
+        }
+
+        // إرسال من مقاطعة للاعب نحو هدف: -1 = الطريق يمر عبر بحيرة بلا ميناء، 0 = لم يُرسل، 1 = أُرسل
+        function trySendFrom(from, target) {
+            if (from === target || from.team !== PLAYER_TEAM) return 0;
+            if (from.kind !== 'port' && crossesLake(from, target)) return -1;
+            return sendTroops(from, target, sendRatio, sendKind) ? 1 : 0;
+        }
+        function sendFromMany(list, target) {
+            let sent = 0, blocked = 0;
+            list.forEach(f => {
+                const r = trySendFrom(f, target);
+                if (r > 0) sent++; else if (r < 0) blocked++;
+            });
+            if (!sent && blocked) showToast('الطريق يمر عبر البحر — تحتاج ميناء (م)');
+            return sent;
+        }
+
+        function toggleSelectAll() {
+            if (isGameOver || paused) return;
+            if (sticky.length) {
+                sticky = [];
+            } else {
+                sticky = nodes.filter(n => n.team === PLAYER_TEAM);
+                if (!sticky.length) return;
+                missileMode = false;
+                updatePowerUI();
+                
+            }
+            selectedNodes = [];
+            hoverNode = null;
+            updateToolbarUI();
+        }
+
+        canvas.addEventListener('pointerdown', (e) => {
+            if (isGameOver || paused) return;
+            const p = toCanvasPoint(e);
+            const n = nodeAt(p.x, p.y);
+            downPoint = p; downTime = performance.now();
+            pointer = p;
+            try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
+            if (missileMode || sticky.length) return; // هذه الأوضاع تعمل بالضغطة القصيرة عند الرفع
+            if (n && n.team === PLAYER_TEAM) {
+                selectedNodes = [n];
+                hoverNode = null;
+            }
+        });
+
+        canvas.addEventListener('pointermove', (e) => {
+            if (selectedNodes.length === 0) return;
+            pointer = toCanvasPoint(e);
+            const current = nodeAt(pointer.x, pointer.y);
+
+            if (current && current.team === PLAYER_TEAM) {
+                if (!selectedNodes.includes(current)) {
+                    selectedNodes.push(current);
+                }
+            }
+
+            hoverNode = current;
+        });
+
+        canvas.addEventListener('pointerup', (e) => {
+            if (isGameOver || paused) { selectedNodes = []; return; }
+            const p = toCanvasPoint(e);
+            const target = nodeAt(p.x, p.y);
+            const isTap = Math.hypot(p.x - downPoint.x, p.y - downPoint.y) < 12;
+
+            // وضع الصاروخ: ضغطة على مقاطعة غير مملوكة لك
+            if (missileMode) {
+                if (target) {
+                    if (target.team !== PLAYER_TEAM) fireMissile(target);
+                    else showToast('اختر مقاطعة عدو أو محايدة');
+                }
+                return;
+            }
+
+            // وضع "تحديد الكل": ضغطة على مقاطعتك تضيفها/تزيلها، وعلى غيرها ترسل إليها من كل المحدد
+            if (sticky.length && selectedNodes.length === 0) {
+                if (!isTap || !target) return;
+                if (target.team === PLAYER_TEAM) {
+                    const i = sticky.indexOf(target);
+                    if (i >= 0 && performance.now() - downTime >= LONG_PRESS_MS) {
+                        const srcs = sticky.filter(n => n !== target && n.team === PLAYER_TEAM);
+                        if (!srcs.length) showToast('أبقِ مقاطعات أخرى محددة لإرسال جنودها');
+                        else if (sendFromMany(srcs, target) > 0) { sticky = []; updateToolbarUI(); }
+                        return;
+                    }
+                    if (i >= 0) sticky.splice(i, 1); else sticky.push(target);
+                    updateToolbarUI();
+                } else {
+                    // استخدام واحد: بعد الإرسال الناجح يعود الزر لوضعه العادي
+                    const sent = sendFromMany(sticky.filter(n => n.team === PLAYER_TEAM), target);
+                    if (sent > 0) {
+                        sticky = [];
+                        updateToolbarUI();
+                    }
+                }
+                return;
+            }
+
+            if (selectedNodes.length === 0) return;
+
+            if (target && selectedNodes.length === 1 && target === selectedNodes[0] && isTap) {
+                // ضغطة قصيرة على مقاطعتك = ترقية
+                target.upgrade();
+            } else if (target) {
+                sendFromMany(selectedNodes, target);
+            }
+
+            selectedNodes = [];
+            hoverNode = null;
+        });
+
+        canvas.addEventListener('pointercancel', () => {
+            selectedNodes = [];
+            hoverNode = null;
+        });
+
+        // ===== ذكاء العدو =====
+        // أربع شخصيات: كل واحدة تحدد الجرأة، حجم الحامية، ميل الترقية، التعاون ضد اللاعب، ونوع الجنود
+        const AI_TYPES = {
+            aggressive: { label: 'هجومي', interval: 2200, ratio: 0.85, garrison: 8,  margin: 0.85, attacks: 2,
+                          upgradeChance: 0.35, upgradeReserve: 25, playerBonus: 1.0, neutralBonus: 0.0, coop: 0.6, fast: 0.35, heavy: 0 },
+            defensive:  { label: 'دفاعي', interval: 3600, ratio: 0.55, garrison: 22, margin: 1.35, attacks: 1,
+                          upgradeChance: 0.7,  upgradeReserve: 12, playerBonus: 0.2, neutralBonus: 0.2, coop: 0.15, fast: 0, heavy: 0.35 },
+            builder:    { label: 'مُرقٍّ',  interval: 3000, ratio: 0.65, garrison: 14, margin: 1.1,  attacks: 1,
+                          upgradeChance: 0.95, upgradeReserve: 6,  playerBonus: 0.3, neutralBonus: 0.6, coop: 0.3, fast: 0, heavy: 0.25 },
+            boss:       { label: 'زعيم',  interval: 2400, ratio: 0.7,  garrison: 30, margin: 1.05,  attacks: 2,
+                          upgradeChance: 0.45, upgradeReserve: 20, playerBonus: 1.0, neutralBonus: 0.3, coop: 0.5, fast: 0, heavy: 0.35 }
+        };
+        const AI_KEYS = ['aggressive', 'defensive', 'builder'];
+        let aiProfiles = {};                       // teamId -> { type, next }
+        let coalition = { target: null, until: 0 }; // أضعف مقاطعة للاعب (هدف مشترك للأعداء)
+
+        function assignAIProfiles() {
+            aiProfiles = {};
+            const order = AI_KEYS.slice().sort(() => Math.random() - 0.5);
+            let i = 0;
+            activeEnemies.forEach(e => {
+                const type = e.id === 'BOSS' ? 'boss' : order[i++ % order.length];
+                aiProfiles[e.id] = { type, next: 2500 + Math.random() * 1500 };
+            });
+            coalition = { target: null, until: 0 };
+        }
+
+        const nodeEff = n => n.count * (n.isFortress ? 1.5 : 1);
+
+        // طول الجزء من القطعة المستقيمة a→b الواقع داخل دائرة (مركزها c ونصف قطرها r)
+        function chordInCircle(ax, ay, bx, by, cx, cy, r) {
+            const dx = bx - ax, dy = by - ay;
+            const fx0 = ax - cx, fy0 = ay - cy;
+            const A = dx * dx + dy * dy;
+            if (A === 0) return 0;
+            const B = 2 * (fx0 * dx + fy0 * dy);
+            const C = fx0 * fx0 + fy0 * fy0 - r * r;
+            const disc = B * B - 4 * A * C;
+            if (disc <= 0) return 0;
+            const s = Math.sqrt(disc);
+            const t1 = Math.max(0, (-B - s) / (2 * A));
+            const t2 = Math.min(1, (-B + s) / (2 * A));
+            return t2 > t1 ? (t2 - t1) * Math.sqrt(A) : 0;
+        }
+
+        // ===== البحيرات والموانئ =====
+        function inLake(x, y) {
+            for (const l of lakes) {
+                const dx = (x - l.nx * W) / (l.nrx * W), dy = (y - l.ny * H) / (l.nry * H);
+                if (dx * dx + dy * dy < 1) return true;
+            }
+            return false;
+        }
+
+        // هل الطريق المستقيم بين مقاطعتين يمر فوق بحيرة؟
+        function crossesLake(a, b) {
+            for (const l of lakes) {
+                const cx = l.nx * W, cy = l.ny * H, rx = l.nrx * W, ry = l.nry * H;
+                if (chordInCircle((a.x - cx) / rx, (a.y - cy) / ry, (b.x - cx) / rx, (b.y - cy) / ry, 0, 0, 1) > 0) return true;
+            }
+            return false;
+        }
+
+        // البحيرة تحلّ محل مقاطعة محايدة عادية في الوسط (تُحذف) ويُحسب نصف قطرها
+        // بحيث لا تلمس أي مقاطعة مجاورة، فيصبح الطريق المستقيم عبرها مغلقاً بلا ميناء
+        function placeLakes() {
+            lakes = [];
+            if (currentLevel < 2) return;
+            const count = currentLevel >= 6 ? 2 : 1;
+            for (let li = 0; li < count; li++) {
+                const cands = nodes
+                    .filter(n => n.team === NEUTRAL_TEAM && !n.isCannon && !n.isFortress && !n.kind && !n.isTarget && n.ny > 0.25 && n.ny < 0.75)
+                    .sort(() => Math.random() - 0.5);
+                for (const c of cands) {
+                    let dmin = Infinity;
+                    for (const n of nodes) if (n !== c) dmin = Math.min(dmin, Math.hypot(n.x - c.x, n.y - c.y));
+                    const edge = Math.min(c.x, W - c.x, c.y, H - c.y) - 6; // لا تخرج البحيرة من حدود الخريطة
+                    const r = Math.min(62, dmin - NODE_R - 10, edge);
+                    if (r < 24) continue;
+                    if (!lakes.every(l => Math.hypot(c.x - l.nx * W, c.y - l.ny * H) > r + l.nrx * W + 10)) continue;
+                    nodes.splice(nodes.indexOf(c), 1);
+                    nodes.forEach((n, i) => { n.id = i; });
+                    lakes.push({ nx: c.nx, ny: c.ny, nrx: r / W, nry: r / H });
+                    break;
+                }
+            }
+        }
+
+        // أقرب مقاطعتين محايدتين على كل ضفة تصبحان ميناءين
+        function placePorts() {
+            for (const l of lakes) {
+                const cx = l.nx * W, cy = l.ny * H, rx = l.nrx * W, ry = l.nry * H;
+                const free = nodes.filter(n => n.team === NEUTRAL_TEAM && !n.isCannon && !n.isFortress && !n.kind && !n.isTarget);
+                const dist = n => Math.hypot((n.x - cx) / rx, (n.y - cy) / ry);
+                const perSide = nodes.length < 26 ? 1 : 2; // خريطة صغيرة: ميناء واحد على كل ضفة
+                const above = free.filter(n => n.y < cy).sort((a, b) => dist(a) - dist(b)).slice(0, perSide);
+                const below = free.filter(n => n.y >= cy).sort((a, b) => dist(a) - dist(b)).slice(0, perSide);
+                above.concat(below).forEach(n => { n.kind = 'port'; });
+            }
+        }
+
+        function drawLakes() {
+            for (const l of lakes) {
+                const cx = l.nx * W, cy = l.ny * H, rx = l.nrx * W, ry = l.nry * H;
+                ctx.beginPath();
+                ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(8,100,140,0.88)';
+                ctx.fill();
+                ctx.lineWidth = 3;
+                ctx.strokeStyle = 'rgba(125,211,252,0.75)';
+                ctx.stroke();
+                ctx.strokeStyle = 'rgba(186,230,253,0.35)';
+                ctx.lineWidth = 1.5;
+                for (let i = -1; i <= 1; i++) {
+                    const y0 = cy + i * ry * 0.5;
+                    const w = rx * 0.55 * (1 - Math.abs(i) * 0.3);
+                    const wob = Math.sin(gameTime / 600 + i * 2) * 3;
+                    ctx.beginPath();
+                    ctx.moveTo(cx - w, y0);
+                    ctx.quadraticCurveTo(cx - w / 2, y0 - 5 + wob, cx, y0);
+                    ctx.quadraticCurveTo(cx + w / 2, y0 + 5 - wob, cx + w, y0);
+                    ctx.stroke();
+                }
+            }
+        }
+
+        // ===== الضباب والتهديد =====
+        // بدون برج: ترى مقاطعاتك وجيرانها فقط. مع برج تملكه: تُكشف الخريطة كلها.
+        function computeVisible() {
+            visibleSet = new Set();
+            if (!fogOn) return;
+            let tower = false;
+            for (const n of nodes) {
+                if (n.team !== PLAYER_TEAM) continue;
+                visibleSet.add(n);
+                n.adj.forEach(a => visibleSet.add(a));
+                if (n.kind === 'tower') tower = true;
+            }
+            if (tower) nodes.forEach(n => visibleSet.add(n));
+        }
+        function isVisible(n) { return !fogOn || visibleSet.has(n); }
+
+        // قوة الجنود المتجهة نحو مقاطعات اللاعب (لمؤشر التحذير) — تمريرة واحدة في الفريم
+        function computeThreats() {
+            threatMap = new Map();
+            for (const t of troops) {
+                if (t.dead) continue;
+                const dst = t.path[1];
+                if (dst.team === PLAYER_TEAM && t.team !== PLAYER_TEAM) threatMap.set(dst, (threatMap.get(dst) || 0) + t.power);
+            }
+            for (const l of launches) {
+                if (l.to.team === PLAYER_TEAM && l.team !== PLAYER_TEAM) {
+                    threatMap.set(l.to, (threatMap.get(l.to) || 0) + l.remaining * KIND[l.kind].power);
+                }
+            }
+        }
+
+        // ===== الصعوبة =====
+        function enemyGrowthMul(team) {
+            return (1 + Math.min(0.5, (currentLevel - 1) * 0.03)) * (team.id === 'BOSS' ? 1.3 : 1) * DIFF[difficulty].growth;
+        }
+
+        // الخسائر المتوقعة من مدافع الآخرين على الطريق المستقيم من المصدر إلى الهدف
+        function cannonLosses(from, to, team) {
+            const range = cannonRange();
+            const pxPerSec = 1.6 * 60;
+            let loss = 0;
+            for (const c of nodes) {
+                if (!c.isCannon || c.team === team) continue;
+                const chord = chordInCircle(from.x, from.y, to.x, to.y, c.x, c.y, range);
+                if (chord <= 0) continue;
+                loss += 0.9 * (chord / pxPerSec) / (cannonReload(c) / 1000);
+            }
+            return loss;
+        }
+
+        // قوة جنود العدو (الخارجين + المنتظرين في الدفعات) المتجهة نحو مقاطعة
+        function threatOn(node) {
+            let s = 0;
+            for (const t of troops) if (!t.dead && t.path[1] === node && t.team !== node.team) s += t.power;
+            for (const l of launches) if (l.to === node && l.team !== node.team) s += l.remaining * KIND[l.kind].power;
+            return s;
+        }
+
+        // قوة حليفة في الطريق للهدف (إذا كان الهدف للاعب فكل الأعداء يُعدّون حلفاء)
+        function alliedInbound(node, team) {
+            let s = 0;
+            const all = node.team === PLAYER_TEAM;
+            const ok = tm => tm === team || (all && activeEnemyIds.has(tm.id));
+            for (const t of troops) if (!t.dead && t.path[1] === node && ok(t.team)) s += t.power;
+            for (const l of launches) if (l.to === node && ok(l.team)) s += l.remaining * KIND[l.kind].power;
+            return s;
+        }
+
+        function updateCoalition() {
+            if (gameTime < coalition.until) return;
+            coalition.until = gameTime + 6000;
+            let best = null;
+            for (const n of nodes) {
+                if (n.team === PLAYER_TEAM && (!best || nodeEff(n) < nodeEff(best))) best = n;
+            }
+            coalition.target = best;
+        }
+
+        function aiTurn(team, prof) {
+            const p = AI_TYPES[prof.type];
+            const mine = nodes.filter(n => n.team === team);
+            if (!mine.length) return;
+
+            // 1) تعزيز مقاطعة مهددة بجيش قادم من أقرب مقاطعة غنية
+            for (const n of mine) {
+                const threat = threatOn(n);
+                if (threat > n.count * 0.8) {
+                    const need = threat - n.count + 6;
+                    let src = null, bd = Infinity;
+                    for (const m of mine) {
+                        if (m === n || m.count < p.garrison + 8) continue;
+                        if (m.kind !== 'port' && crossesLake(m, n)) continue;
+                        const d = Math.hypot(m.x - n.x, m.y - n.y);
+                        if (d < bd) { bd = d; src = m; }
+                    }
+                    if (src) {
+                        sendTroops(src, n, Math.min(0.7, Math.max(0.2, need / src.count)));
+                        return;
+                    }
+                }
+            }
+
+            // 2) ترقية المقاطعات الغنية (والتي تقترب من السقف 100)
+            const maxUps = p.upgradeChance > 0.9 ? 2 : 1;
+            let ups = 0;
+            const upCands = mine.filter(n => n.level < MAX_LEVEL).sort((a, b) => b.count - a.count);
+            for (const n of upCands) {
+                if (ups >= maxUps) break;
+                const cost = n.upgradeCost();
+                const overflow = n.count >= 90 && n.count >= cost;
+                const want = n.count >= cost + p.upgradeReserve && Math.random() < p.upgradeChance && threatOn(n) < n.count * 0.4;
+                if (overflow || want) { n.upgrade(); ups++; }
+            }
+
+            // 3) الهجوم: يختار الهدف الأعلى قيمة نسبةً لتكلفته، مع حساب خسائر المدافع والبحيرات
+            const coopRoll = Math.random() < Math.min(1, p.coop + DIFF[difficulty].coop);
+            const ct = (coopRoll && coalition.target && coalition.target.team === PLAYER_TEAM) ? coalition.target : null;
+            let attacksLeft = p.attacks + DIFF[difficulty].extraAttack;
+            let attacked = false;
+            const sources = mine
+                .filter(n => n.count > p.garrison + 6 && threatOn(n) < n.count * 0.5)
+                .sort((a, b) => b.count - a.count)
+                .slice(0, 4);
+
+            for (const src of sources) {
+                if (attacksLeft <= 0) break;
+                const amount = Math.floor(Math.min(src.count - p.garrison, src.count * p.ratio));
+                if (amount < 5) continue;
+
+                let best = null, bestScore = 0, bestNeeded = 0, bestInbound = 0;
+                for (const t of nodes) {
+                    if (t.team === team) continue;
+                    if (src.kind !== 'port' && crossesLake(src, t)) continue;
+                    const losses = cannonLosses(src, t, team);
+                    const needed = (nodeEff(t) + losses + 2) * p.margin * DIFF[difficulty].margin;
+                    const inbound = alliedInbound(t, team);
+                    if (inbound >= needed) continue;            // مغطّى بجنود في الطريق أصلاً
+                    if (amount + inbound < needed) continue;    // غير كافٍ حتى مع المساندة
+
+                    let value = 1;
+                    if (t.team === PLAYER_TEAM) value += p.playerBonus;
+                    else if (t.team === NEUTRAL_TEAM) value += p.neutralBonus;
+                    if (t.isCannon) value += 0.6;
+                    if (t.isFortress) value += 0.2;
+                    if (t.kind === 'factory') value += 0.4;
+                    if (t.level > 1) value += 0.15 * (t.level - 1);
+                    if (ct && t === ct) value += 1.5;
+
+                    const dist = Math.hypot(t.x - src.x, t.y - src.y);
+                    const score = value / (needed + dist * 0.03 + 4);
+                    if (score > bestScore) { bestScore = score; best = t; bestNeeded = needed; bestInbound = inbound; }
+                }
+
+                if (best) {
+                    let kind = 'normal';
+                    if (p.heavy && Math.random() < p.heavy) kind = 'heavy';
+                    else if (p.fast && Math.random() < p.fast && amount * KIND.fast.power + bestInbound >= bestNeeded) kind = 'fast';
+                    if (sendTroops(src, best, amount / src.count, kind)) {
+                        attacksLeft--;
+                        attacked = true;
+                    }
+                }
+            }
+
+            // 4) مقاطعة ممتلئة ولا هجوم مناسب: لا تُهدر النمو، أرسل نصفها لأضعف هدف
+            if (!attacked) {
+                const full = mine.find(n => n.count >= 95);
+                if (full) {
+                    let weakest = null, wScore = Infinity;
+                    for (const t of nodes) {
+                        if (t.team === team) continue;
+                        if (full.kind !== 'port' && crossesLake(full, t)) continue;
+                        const sc = nodeEff(t) + cannonLosses(full, t, team);
+                        if (sc < wScore) { wScore = sc; weakest = t; }
+                    }
+                    if (weakest) sendTroops(full, weakest, 0.5);
+                }
+            }
+        }
+
+        function runAI() {
+            if (isGameOver || gameTime < freezeUntil) return; // التجميد يوقف قرارات الأعداء
+            updateCoalition();
+            // أعلى مستوى = قرارات أسرع (حتى 35% من الزمن الأصلي)
+            const lvlScale = Math.max(0.35, 1 - 0.035 * (currentLevel - 1));
+            for (const team of activeEnemies) {
+                const prof = aiProfiles[team.id];
+                if (!prof || gameTime < prof.next) continue;
+                prof.next = gameTime + AI_TYPES[prof.type].interval * lvlScale * DIFF[difficulty].ai * (0.8 + Math.random() * 0.4);
+                aiTurn(team, prof);
+            }
+        }
+
+        // تصادم الجنود بشبكة مكانية. كل جندي له قوة وصحة: يخسر كل طرف صحة تساوي قوة الآخر
+        function checkTroopCollisions() {
+            const CS = 14; // أكبر من مسافة التصادم (≈11)
+            const grid = new Map();
+            for (let i = 0; i < troops.length; i++) {
+                const t = troops[i];
+                if (t.dead) continue;
+                const key = Math.floor(t.x / CS) * 100003 + Math.floor(t.y / CS);
+                const b = grid.get(key);
+                if (b) b.push(i); else grid.set(key, [i]);
+            }
+            for (let i = 0; i < troops.length; i++) {
+                const t1 = troops[i];
+                if (t1.dead) continue;
+                const cx = Math.floor(t1.x / CS), cy = Math.floor(t1.y / CS);
+                for (let ox = -1; ox <= 1 && !t1.dead; ox++) {
+                    for (let oy = -1; oy <= 1 && !t1.dead; oy++) {
+                        const b = grid.get((cx + ox) * 100003 + (cy + oy));
+                        if (!b) continue;
+                        for (const j of b) {
+                            if (j <= i) continue;
+                            const t2 = troops[j];
+                            if (t2.dead || t1.team === t2.team) continue;
+                            if (Math.hypot(t1.x - t2.x, t1.y - t2.y) <= t1.radius + t2.radius + 2) {
+                                const p1 = t1.power, p2 = t2.power;
+                                t1.hp -= p2;
+                                t2.hp -= p1;
+                                if (t1.hp <= 1e-6) t1.dead = true;
+                                if (t2.hp <= 1e-6) t2.dead = true;
+                                if (t1.dead) break;
+                            }
+                        }
+                    }
+                }
+            }
+            troops = troops.filter(t => !t.dead);
+        }
+
+        function setScore(el, key, val) {
+            if (!el || scoreEls.last[key] === val) return;
+            scoreEls.last[key] = val;
+            el.innerText = val;
+        }
+
+        // ===== أهداف المراحل =====
+        function objectiveText() {
+            const secs = () => Math.max(0, Math.ceil((objective.endAt - gameTime) / 1000));
+            switch (objective.type) {
+                case 'capture': return 'احتل المقاطعة ★';
+                case 'survive': return `اصمد ${secs()} ث`;
+                case 'timed': return `اقضِ عليهم خلال ${secs()} ث`;
+                case 'boss': return 'اهزم الزعيم وجنوده';
+                default: return 'اقضِ على الأعداء';
+            }
+        }
+        function updateObjectiveUI() {
+            const el = document.getElementById('objText');
+            if (el) el.innerText = objectiveText();
+        }
+
+        // تمريرة واحدة على المقاطعات والجنود (تُستدعى 5 مرات في الثانية)
+        function checkGameState() {
+            let pTotal = 0, pNodes = 0, eNodes = 0;
+            const eTotals = {};
+            for (const n of nodes) {
+                if (n.team === PLAYER_TEAM) {
+                    pNodes++;
+                    pTotal += Math.floor(n.count);
+                } else if (activeEnemyIds.has(n.team.id)) {
+                    eNodes++;
+                    eTotals[n.team.id] = (eTotals[n.team.id] || 0) + Math.floor(n.count);
+                }
+            }
+            let pTroops = 0, eTroops = 0;
+            for (const t of troops) {
+                if (t.dead) continue;
+                if (t.team === PLAYER_TEAM) pTroops++;
+                else if (activeEnemyIds.has(t.team.id)) eTroops++;
+            }
+            for (const l of launches) { // جنود لم يخرجوا بعد من المقاطعة
+                if (l.team === PLAYER_TEAM) pTroops += l.remaining;
+                else if (activeEnemyIds.has(l.team.id)) eTroops += l.remaining;
+            }
+
+            setScore(scoreEls.player, 'player', pTotal);
+            if (!isGameOver && pTotal > best.score) best.score = pTotal;
+            activeEnemies.forEach(e => setScore(scoreEls.enemies[e.id], e.id, eTotals[e.id] || 0));
+            updateObjectiveUI();
+
+            if (isGameOver) return;
+
+            if (pNodes === 0 && pTroops === 0) {
+                showGameOver(false);
+            } else if (eNodes === 0 && eTroops === 0) {
+                showGameOver(true);
+            } else if (objective.type === 'capture') {
+                const tg = nodes.find(n => n.isTarget);
+                if (tg && tg.team === PLAYER_TEAM) showGameOver(true);
+            } else if (objective.type === 'survive') {
+                if (gameTime >= objective.endAt) showGameOver(true);
+            } else if (objective.type === 'timed') {
+                if (gameTime >= objective.endAt) showGameOver(false, 'انتهى الوقت قبل القضاء على الأعداء.');
+            }
+        }
+
+        // ===== المهارات الخاصة =====
+        function updatePowerUI() {
+            ['freeze', 'boost', 'missile'].forEach(k => {
+                const el = document.getElementById('pwc_' + k);
+                if (el) el.innerText = powerups[k];
+            });
+            document.querySelectorAll('.pwBtn').forEach(b => {
+                const k = b.dataset.p;
+                b.classList.toggle('opacity-40', powerups[k] <= 0);
+                b.classList.toggle('ring-2', k === 'missile' && missileMode);
+                b.classList.toggle('ring-amber-400', k === 'missile' && missileMode);
+            });
+        }
+
+        function updateToolbarUI() {
+            const b = document.getElementById('selectAllBtn');
+            if (!b) return;
+            b.innerText = sticky.length ? `إلغاء التحديد (${sticky.length})` : 'تحديد الكل';
+            b.classList.toggle('bg-amber-600', sticky.length > 0);
+            b.classList.toggle('text-white', sticky.length > 0);
+            b.classList.toggle('text-amber-300', sticky.length === 0);
+        }
+
+        function usePowerup(kind) {
+            if (isGameOver || paused) return;
+            if (!(powerups[kind] > 0)) { showToast('لا تملك هذه المهارة — تُكسب بالفوز بالمراحل'); return; }
+            if (kind === 'freeze') {
+                powerups.freeze--;
+                freezeUntil = gameTime + 5000;
+                showToast('تم تجميد الأعداء 5 ثوانٍ');
+            } else if (kind === 'boost') {
+                powerups.boost--;
+                boostUntil = gameTime + 10000;
+                showToast('نمو مضاعف لمقاطعاتك 10 ثوانٍ');
+            } else if (kind === 'missile') {
+                missileMode = !missileMode;
+                sticky = []; selectedNodes = [];
+                showToast(missileMode ? 'اضغط على مقاطعة عدو أو محايدة لإطلاق الصاروخ' : 'أُلغي الصاروخ');
+                updatePowerUI(); updateToolbarUI();
+                return;
+            }
+            updatePowerUI();
+            saveGame();
+        }
+
+        const MISSILE_DAMAGE = 25;
+        function fireMissile(target) {
+            if (!(powerups.missile > 0)) { missileMode = false; updatePowerUI(); return; }
+            powerups.missile--;
+            missileMode = false;
+            target.count = Math.max(1, target.count - MISSILE_DAMAGE);
+            showToast('تم إطلاق الصاروخ');
+            fx.push({ kind: 'ring', x: target.x, y: target.y, color: '#fde047', life: 1 });
+            fx.push({ kind: 'ring', x: target.x, y: target.y, color: '#ef4444', life: 1.4 });
+            addFloatText(target.x, target.y - target.radius - 10, `-${MISSILE_DAMAGE}`, '#fca5a5');
+            updatePowerUI();
+            saveGame();
+        }
+
+        // مكافأة الفوز: مهارة عشوائية، وكل المهارات الثلاث بعد مرحلة الزعيم
+        function grantPowerups() {
+            const names = { freeze: 'تجميد', boost: 'نمو مضاعف', missile: 'صاروخ' };
+            const keys = Object.keys(names);
+            let label;
+            if (currentLevel % 5 === 0) {
+                keys.forEach(k => { powerups[k]++; });
+                label = 'المهارات الثلاث';
+            } else {
+                const k = keys[Math.floor(Math.random() * keys.length)];
+                powerups[k]++;
+                label = names[k];
+            }
+            updatePowerUI();
+            return label;
+        }
+
+        // ===== الإيقاف المؤقت =====
+        function setPaused(p) {
+            paused = p;
+            const m = document.getElementById('pauseModal');
+            if (m) m.classList.toggle('hidden', !p);
+            if (p) { selectedNodes = []; hoverNode = null; }
+        }
+        function togglePause() {
+            if (isGameOver) return;
+            setPaused(!paused);
+        }
+
+        function showGameOver(won, reason) {
+            isGameOver = true;
+            missileMode = false;
+            sticky = [];
+            selectedNodes = [];
+            updatePowerUI();
+            updateToolbarUI();
+            const modal = document.getElementById('gameOverModal');
+            const icon = document.getElementById('modalIcon');
+            const title = document.getElementById('modalTitle');
+            const sub = document.getElementById('modalSub');
+            const modalBtn = document.getElementById('modalRestartBtn');
+            const token = gameToken;
+            playSfx(won ? 'win' : 'lose');
+            // فوز => المستوى التالي محفوظ، هزيمة => إعادة نفس المستوى عند المتابعة
+            let carryData = null;
+            let granted = '';
+            if (won) {
+                const mine = nodes.filter(n => n.team === PLAYER_TEAM);
+                const total = mine.reduce((a, n) => a + Math.floor(n.count), 0)
+                    + troops.filter(t => t.team === PLAYER_TEAM && !t.dead).reduce((a, t) => a + KIND[t.kind].cost, 0)
+                    + launches.filter(l => l.team === PLAYER_TEAM).reduce((a, l) => a + l.remaining * KIND[l.kind].cost, 0);
+                const lvl = Math.max(peakLevel, ...mine.map(n => n.level), 1);
+                carryData = { count: total, level: lvl };
+                if (mine.filter(n => n.level >= MAX_LEVEL).length >= 4) carryData.nodes = [{ l: MAX_LEVEL, c: 100 }, { l: MAX_LEVEL, c: 50 }];
+                pendingCarry = carryData;
+                granted = grantPowerups();
+            } else {
+                carryData = levelCarry;
+                pendingCarry = null;
+            }
+            // الهزيمة تعيد المهارات التي كانت معك عند بداية المرحلة
+            const pwSave = won ? { ...powerups } : { ...levelStartPw };
+            writeSave({ v: 1, level: won ? currentLevel + 1 : currentLevel, nodes: null, carry: carryData, pw: pwSave, pw0: pwSave, df: difficulty });
+
+            if (won) {
+                icon.className = 'w-16 h-16 md:w-20 md:h-20 mx-auto rounded-3xl flex items-center justify-center text-3xl md:text-4xl shadow-xl bg-blue-500/20 text-blue-400 border border-blue-500/30';
+                icon.innerHTML = '<svg class="ico" viewBox="0 0 512 512" fill="currentColor" aria-hidden="true"><path d="M144.3 0h224c26.5 0 48.1 21.8 47.1 48.2-.2 5.3-.4 10.6-.7 15.8h49.6c26.1 0 49.1 21.6 47.1 49.8-7.5 103.7-60.5 160.7-118 190.5-15.8 8.2-31.9 14.3-47.2 18.8-20.2 28.6-41.2 43.7-57.9 51.8V448h64c17.7 0 32 14.3 32 32s-14.3 32-32 32h-192c-17.7 0-32-14.3-32-32s14.3-32 32-32h64v-73.1c-16-7.7-35.9-22-55.3-48.3-18.4-4.8-38.4-12.1-57.9-23.1C57 273.2 8.2 216.1 1.2 113.6c-1.9-28.1 21-49.7 47.1-49.7h49.6c-.3-5.2-.5-10.4-.7-15.8-1-26.5 20.6-48.2 47.1-48.2zm-42.8 112H49.1c6.2 84.7 45.1 127.1 85.2 149.6-14.4-37.3-26.3-86-32.8-149.6M380 256.8c40.5-23.8 77.1-66.1 83.3-144.8H411c-6.2 60.9-17.4 108.2-31 144.8"/></svg>';
+                title.innerText = `فزت بالمستوى ${currentLevel}!`;
+                sub.innerText = `جيشك (${carryData.count} جندي، ترقية ${carryData.level}) ${carryData.nodes ? 'سينتقل معك في مقاطعتين مكتملتي الترقية (واحدة ممتلئة ونصف الأخرى)' : 'سينتقل معك في مقاطعة واحدة'}` +
+                    (granted ? ` — مكافأة: ${granted}` : '') + '...';
+                modalBtn.innerText = 'الانتقال الفوري للمستوى التالي';
+                modalBtn.dataset.won = '1';
+
+                setTimeout(() => {
+                    if (isGameOver && token === gameToken) {
+                        initGame(currentLevel + 1);
+                    }
+                }, 1500);
+            } else {
+                icon.className = 'w-16 h-16 md:w-20 md:h-20 mx-auto rounded-3xl flex items-center justify-center text-3xl md:text-4xl shadow-xl bg-red-500/20 text-red-400 border border-red-500/30';
+                icon.innerHTML = '<svg class="ico" viewBox="0 0 512 512" fill="currentColor" aria-hidden="true"><path d="M416 427.4c58.5-44 96-111.6 96-187.4C512 107.5 397.4 0 256 0S0 107.5 0 240c0 75.8 37.5 143.4 96 187.4V464c0 26.5 21.5 48 48 48h32v-40c0-13.3 10.7-24 24-24s24 10.7 24 24v40h64v-40c0-13.3 10.7-24 24-24s24 10.7 24 24v40h32c26.5 0 48-21.5 48-48zM96 256a64 64 0 1 1 128 0 64 64 0 1 1-128 0m256-64a64 64 0 1 1 0 128 64 64 0 1 1 0-128"/></svg>';
+                title.innerText = 'هزيمة!';
+                sub.innerHTML = (reason ? reason + '<br>' : '') + `أعلى سكور: ${best.score}<br>أعلى مستوى: ${best.level}`;
+                modalBtn.innerText = 'اللعب مرة أخرى من المستوى 1';
+                modalBtn.dataset.won = '0';
+            }
+
+            modal.classList.remove('hidden');
+        }
+
+        function gameLoop(ts) {
+            if (ts === undefined) ts = performance.now();
+            let dt = lastFrameTs ? ts - lastFrameTs : 16.667;
+            lastFrameTs = ts;
+            if (dt > 50) dt = 50;   // لا قفزات كبيرة بعد تأخر الفريمات
+            if (dt < 0) dt = 0;
+            const run = !paused;
+            const k = run ? dt / 16.667 : 0; // 1 = فريم واحد على شاشة 60Hz
+            if (run) gameTime += dt;
+            const frozen = gameTime < freezeUntil;
+
+            ctx.fillStyle = '#0b1220';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            if (mapDirty) {
+                renderMap();
+                mapDirty = false;
+            }
+            ctx.imageSmoothingEnabled = true;
+            ctx.drawImage(mapCanvas, 0, 0, W, H);
+            drawLakes();
+
+            if (selectedNodes.length > 0) {
+                ctx.strokeStyle = 'rgba(255,255,255,0.85)';
+                ctx.lineWidth = 3;
+                ctx.setLineDash([8, 6]);
+
+                for (let i = 0; i < selectedNodes.length - 1; i++) {
+                    ctx.beginPath();
+                    ctx.moveTo(selectedNodes[i].x, selectedNodes[i].y);
+                    ctx.lineTo(selectedNodes[i + 1].x, selectedNodes[i + 1].y);
+                    ctx.stroke();
+                }
+
+                const lastSelected = selectedNodes[selectedNodes.length - 1];
+                ctx.beginPath();
+                ctx.moveTo(lastSelected.x, lastSelected.y);
+                ctx.lineTo(pointer.x, pointer.y);
+                ctx.stroke();
+
+                ctx.setLineDash([]);
+            }
+
+            if (run) {
+                if (!isGameOver) {
+                    // النمو والذكاء والإرسال كلها على ساعة اللعبة فتتوقف مع الإيقاف
+                    growAcc += dt;
+                    while (growAcc >= 1000) {
+                        growAcc -= 1000;
+                        nodes.forEach(node => node.grow());
+                    }
+                    runAI();
+                    updateLaunches(dt);
+                }
+                updateCannons(gameTime);
+                shells.forEach(s => s.update(k));
+                shells = shells.filter(s => !s.dead);
+                troops = troops.filter(t => !t.dead);
+
+                troops.forEach(troop => {
+                    if (frozen && troop.team !== PLAYER_TEAM) return; // جنود الأعداء متجمدون
+                    troop.update(k);
+                });
+                troops = troops.filter(t => !t.reached);
+
+                // الجنود البريون الذين يدخلون البحيرة يغرقون (السفن من الموانئ تعبرها)
+                if (lakes.length) {
+                    for (const t of troops) {
+                        if (!t.dead && !t.ship && inLake(t.x, t.y)) {
+                            t.dead = true;
+                            fx.push({ kind: 'ring', x: t.x, y: t.y, color: '#38bdf8', life: 1 });
+                        }
+                    }
+                    troops = troops.filter(t => !t.dead);
+                }
+
+                checkTroopCollisions();
+            }
+
+            computeThreats();
+            computeVisible();
+
+            troops.forEach(troop => troop.draw());
+            nodes.forEach(node => node.draw());
+            shells.forEach(s => s.draw());
+            updateAndDrawFx(k);
+
+            // طبقات الحالة: تجميد، نمو مضاعف، وضع الصاروخ
+            if (frozen) {
+                ctx.fillStyle = 'rgba(125,211,252,0.10)';
+                ctx.fillRect(0, 0, W, H);
+            }
+            let hy = 14;
+            ctx.font = 'bold 12px Cairo, Tahoma, "Segoe UI", Arial, sans-serif';
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'middle';
+            if (frozen) {
+                ctx.fillStyle = '#7dd3fc';
+                ctx.fillText('تجميد الأعداء ' + ((freezeUntil - gameTime) / 1000).toFixed(1) + ' ث', 8, hy);
+                hy += 16;
+            }
+            if (gameTime < boostUntil) {
+                ctx.fillStyle = '#86efac';
+                ctx.fillText('نمو ×2 ' + ((boostUntil - gameTime) / 1000).toFixed(1) + ' ث', 8, hy);
+            }
+            if (missileMode) {
+                ctx.strokeStyle = '#fbbf24';
+                ctx.lineWidth = 3;
+                ctx.setLineDash([10, 8]);
+                ctx.strokeRect(3, 3, W - 6, H - 6);
+                ctx.setLineDash([]);
+            }
+
+            uiAcc += dt;
+            if (uiAcc >= 200) { // 5 مرات في الثانية بدل كل فريم
+                uiAcc = 0;
+                if (sticky.length) {
+                    const before = sticky.length;
+                    sticky = sticky.filter(n => n.team === PLAYER_TEAM);
+                    if (sticky.length !== before) updateToolbarUI();
+                }
+                checkGameState();
+            }
+            requestAnimationFrame(gameLoop);
+        }
+
+        document.getElementById('restartBtn').addEventListener('click', () => {
+            if (currentLevel > 1 && !confirm('سيتم البدء من المستوى 1 واستبدال الحفظ الحالي. متابعة؟')) return;
+            startNewGame();
+        });
+        document.getElementById('modalRestartBtn').addEventListener('click', () => {
+            const won = document.getElementById('modalRestartBtn').dataset.won === '1';
+            if (won) initGame(currentLevel + 1); else startNewGame();
+        });
+
+        // ===== المؤثرات الصوتية =====
+        let audioCtx = null, lastRepel = 0;
+        function getAudio() {
+            try {
+                if (!audioCtx) {
+                    const AC = window.AudioContext || window.webkitAudioContext;
+                    if (!AC) return null;
+                    audioCtx = new AC();
+                }
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                return audioCtx;
+            } catch (e) { return null; }
+        }
+        function tone(freq, start, dur, type, vol) {
+            const a = getAudio();
+            if (!a) return;
+            const t = a.currentTime + start;
+            const o = a.createOscillator(), g = a.createGain();
+            o.type = type;
+            o.frequency.setValueAtTime(freq, t);
+            g.gain.setValueAtTime(0.0001, t);
+            g.gain.exponentialRampToValueAtTime(vol, t + 0.02);
+            g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+            o.connect(g); g.connect(a.destination);
+            o.start(t); o.stop(t + dur + 0.05);
+        }
+        function playSfx(kind) {
+            if (kind === 'win') {
+                [523, 659, 784, 1047].forEach((f, i) => tone(f, i * 0.13, 0.35, 'triangle', 0.18));
+                tone(1318, 0.52, 0.6, 'triangle', 0.16);
+            } else if (kind === 'lose') {
+                [392, 349, 311, 262].forEach((f, i) => tone(f, i * 0.25, 0.45, 'sawtooth', 0.09));
+            } else if (kind === 'repel') {
+                const now = performance.now();
+                if (now - lastRepel < 350) return;
+                lastRepel = now;
+                tone(180, 0, 0.12, 'square', 0.08);
+                tone(320, 0.06, 0.15, 'triangle', 0.1);
+            }
+        }
+        document.addEventListener('pointerdown', getAudio);
+
+        // ===== أعلى نتيجة ومستوى =====
+        const BEST_KEY = 'stateio_best_v1';
+        let best = { score: 0, level: 1 };
+        try {
+            const b = JSON.parse(localStorage.getItem(BEST_KEY));
+            if (b) { best.score = b.score | 0; best.level = (b.level | 0) || 1; }
+        } catch (e) {}
+        function saveBest() { try { localStorage.setItem(BEST_KEY, JSON.stringify(best)); } catch (e) {} }
+
+        // ===== الحفظ والتحميل (localStorage) =====
+        const SAVE_KEY = 'stateio_straight_save_v1';
+
+        function readSave() {
+            try {
+                const raw = localStorage.getItem(SAVE_KEY);
+                if (!raw) return null;
+                const d = JSON.parse(raw);
+                if (!d || d.v !== 1 || !(d.level >= 1)) return null;
+                return d;
+            } catch (e) { return null; }
+        }
+
+        function writeSave(d) {
+            try {
+                d.ts = Date.now(); saveBest();
+                localStorage.setItem(SAVE_KEY, JSON.stringify(d));
+                return true;
+            } catch (e) { return false; }
+        }
+
+        function buildSave() {
+            return {
+                v: 1,
+                df: difficulty,
+                level: currentLevel,
+                carry: levelCarry,
+                peak: peakLevel,
+                nodes: nodes.map(n => ({
+                    nx: n.nx, ny: n.ny, t: n.team.id,
+                    c: Math.round(n.count * 100) / 100,
+                    l: n.level, k: n.isCannon ? 1 : 0, f: n.isFortress ? 1 : 0,
+                    a: Math.round(n.aimAngle * 1000) / 1000,
+                    kd: n.kind || 0, g: n.isTarget ? 1 : 0
+                })),
+                troops: troops.filter(t => !t.dead && !t.reached).map(t => ({
+                    f: t.path[0].id, to: t.path[1].id,
+                    nx: t.x / W, ny: t.y / H, t: t.team.id,
+                    k: t.kind, h: Math.round(t.hp * 100) / 100, s: t.ship ? 1 : 0
+                })),
+                // الجنود الذين لم يخرجوا بعد من المقاطعة (كانوا يضيعون عند الحفظ سابقاً)
+                launches: launches.filter(l => l.remaining > 0).map(l => ({
+                    f: l.from.id, to: l.to.id, t: l.team.id, r: l.remaining, k: l.kind
+                })),
+                ai: Object.fromEntries(Object.entries(aiProfiles).map(([id, pr]) => [id, pr.type])),
+                lakes: lakes,
+                obj: { k: objective.type, left: objective.endAt != null ? Math.max(0, Math.round(objective.endAt - gameTime)) : null },
+                pw: { ...powerups },
+                pw0: { ...levelStartPw }
+            };
+        }
+
+        function saveGame() {
+            if (isGameOver || !nodes.length) return false;
+            return writeSave(buildSave());
+        }
+
+        function teamById(id) {
+            if (id === PLAYER_TEAM.id) return PLAYER_TEAM;
+            if (id === NEUTRAL_TEAM.id) return NEUTRAL_TEAM;
+            if (id === BOSS_TEAM.id) return BOSS_TEAM;
+            return ENEMY_PALETTE.find(e => e.id === id) || null;
+        }
+
+        function applySave(d) {
+            pendingCarry = d.carry || null;
+            setDifficulty(d.df);
+            initGame(d.level, true);
+            if (d.pw) powerups = { freeze: 0, boost: 0, missile: 0, ...d.pw };
+            levelStartPw = d.pw0 ? { freeze: 0, boost: 0, missile: 0, ...d.pw0 } : { ...powerups };
+            updatePowerUI();
+            if (d.nodes && d.nodes.length) {
+                const restored = [];
+                for (let i = 0; i < d.nodes.length; i++) {
+                    const o = d.nodes[i];
+                    const team = teamById(o.t);
+                    if (!team) { saveGame(); return; } // حفظ تالف: نبدأ المستوى من جديد
+                    const n = new Node(i, o.nx, o.ny, team, o.c);
+                    n.level = o.l || 1;
+                    n.isCannon = !!o.k;
+                    n.isFortress = !!o.f;
+                    n.kind = o.kd || null;
+                    n.isTarget = !!o.g;
+                    if (typeof o.a === 'number') n.aimAngle = o.a;
+                    restored.push(n);
+                }
+                nodes = restored;
+                troops = [];
+                (d.troops || []).forEach(o => {
+                    const a = nodes[o.f], b = nodes[o.to], team = teamById(o.t);
+                    if (!a || !b || !team) return;
+                    const t = new Troop([a, b], team, o.k, !!o.s);
+                    if (typeof o.h === 'number') t.hp = o.h;
+                    t.x = o.nx * W;
+                    t.y = o.ny * H;
+                    troops.push(t);
+                });
+                launches = [];
+                (d.launches || []).forEach(o => {
+                    const a = nodes[o.f], b = nodes[o.to], team = teamById(o.t);
+                    if (!a || !b || !team || !(o.r > 0)) return;
+                    launches.push({ from: a, to: b, team, remaining: Math.floor(o.r), kind: KIND[o.k] ? o.k : 'normal', ship: a.kind === 'port', acc: 0 });
+                });
+                if (d.ai) {
+                    activeEnemies.forEach(e => {
+                        if (aiProfiles[e.id] && AI_TYPES[d.ai[e.id]]) aiProfiles[e.id].type = d.ai[e.id];
+                    });
+                }
+                lakes = Array.isArray(d.lakes) ? d.lakes : [];
+                if (d.obj && d.obj.k) {
+                    objective = { type: d.obj.k };
+                    if (d.obj.left != null) objective.endAt = d.obj.left; // الساعة تبدأ من 0 بعد التحميل
+                } else {
+                    objective = { type: 'conquer' }; // حفظ قديم بلا هدف
+                }
+                buildMap();
+                updateObjectiveUI();
+                peakLevel = Math.max(peakLevel, d.peak || 1,
+                    ...nodes.filter(n => n.team === PLAYER_TEAM).map(n => n.level));
+            }
+            saveGame();
+        }
+
+        let toastTimer = 0;
+        function showToast(msg) {
+            const el = document.getElementById('toast');
+            el.innerText = msg;
+            el.style.opacity = '1';
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => { el.style.opacity = '0'; }, 1600);
+        }
+
+        document.getElementById('saveBtn').addEventListener('click', () => {
+            if (isGameOver) { showToast('تقدمك محفوظ بالفعل'); return; }
+            showToast(saveGame() ? 'تم حفظ اللعبة ✓' : 'تعذّر الحفظ (التخزين غير متاح)');
+        });
+
+        // حفظ تلقائي دوري + عند إخفاء الصفحة أو إغلاقها
+        setInterval(saveGame, 5000);
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                saveGame();
+                if (!isGameOver) setPaused(true); // إيقاف تلقائي عند مغادرة التبويب
+            }
+        });
+        document.getElementById('pauseBtn').addEventListener('click', togglePause);
+        document.getElementById('resumeBtn').addEventListener('click', () => setPaused(false));
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' || e.key === 'p' || e.key === 'P') togglePause();
+        });
+        window.addEventListener('pagehide', saveGame);
+
+        // اختيار الصعوبة قبل أي بداية من المستوى 1
+        let diffWasPaused = false;
+        function startNewGame() {
+            const modal = document.getElementById('diffModal');
+            const cancel = document.getElementById('diffCancelBtn');
+            const inGame = !isGameOver && nodes.length > 0;
+            diffWasPaused = paused;
+            if (inGame) setPaused(true);
+            cancel.classList.toggle('hidden', !inGame);
+            modal.classList.remove('hidden');
+            modal.querySelectorAll('.diffBtn').forEach(b => {
+                b.style.outline = b.dataset.d === difficulty ? '3px solid #fff' : 'none';
+                b.onclick = () => {
+                    modal.classList.add('hidden');
+                    setDifficulty(b.dataset.d);
+                    initGame(1);
+                };
+            });
+            cancel.onclick = () => {
+                modal.classList.add('hidden');
+                if (!diffWasPaused) setPaused(false);
+            };
+        }
+
+        function showStartChoice(d) {
+            const modal = document.getElementById('startModal');
+            let when = '';
+            try { when = new Date(d.ts).toLocaleString('ar-EG'); } catch (e) {}
+            document.getElementById('startSub').innerText =
+                `المستوى ${d.level}` + (d.nodes ? ' (مع حالة الخريطة)' : '') + (when ? ` — آخر حفظ: ${when}` : '');
+            modal.classList.remove('hidden');
+
+            document.getElementById('continueBtn').onclick = () => {
+                modal.classList.add('hidden');
+                applySave(d);
+            };
+            document.getElementById('newGameBtn').onclick = () => {
+                modal.classList.add('hidden');
+                startNewGame();
+            };
+        }
+
+        function setRatio(r, persist = true) {
+            sendRatio = r;
+            document.querySelectorAll('.ratioBtn').forEach(b => {
+                const on = parseFloat(b.dataset.r) === r;
+                b.classList.toggle('bg-blue-600', on);
+                b.classList.toggle('text-white', on);
+                b.classList.toggle('text-slate-300', !on);
+            });
+            if (persist) { try { localStorage.setItem('stateio_ratio', String(r)); } catch (e) {} }
+        }
+        document.querySelectorAll('.ratioBtn').forEach(b =>
+            b.addEventListener('click', () => setRatio(parseFloat(b.dataset.r))));
+        let savedRatio = 1;
+        try {
+            const v = parseFloat(localStorage.getItem('stateio_ratio'));
+            if ([0.25, 0.5, 1].includes(v)) savedRatio = v;
+        } catch (e) {}
+        setRatio(savedRatio, false);
+
+        // نوع الجنود
+        function setKind(kd, persist = true) {
+            sendKind = (kd === 'prod' || kd === 'fast' || kd === 'heavy') ? kd : 'prod';
+            document.querySelectorAll('.kindBtn').forEach(b => {
+                const on = b.dataset.k === sendKind;
+                b.classList.toggle('bg-blue-600', on);
+                b.classList.toggle('text-white', on);
+                b.classList.toggle('text-slate-300', !on);
+            });
+            if (persist) { try { localStorage.setItem('stateio_kind', sendKind); } catch (e) {} }
+        }
+        document.querySelectorAll('.kindBtn').forEach(b => b.addEventListener('click', () => { setKind(b.dataset.k); showToast(b.title); }));
+        let savedKind = 'prod';
+        try { const v = localStorage.getItem('stateio_kind'); if (['prod', 'fast', 'heavy'].includes(v)) savedKind = v; } catch (e) {}
+        setKind(savedKind, false);
+
+        document.getElementById('selectAllBtn').addEventListener('click', toggleSelectAll);
+        document.querySelectorAll('.pwBtn').forEach(b => b.addEventListener('click', () => usePowerup(b.dataset.p)));
+
+        resizeCanvas();
+        gameLoop();
+        const savedGame = readSave();
+        if (savedGame) showStartChoice(savedGame);
+        else startNewGame();
+    </script>
+</body>
+</html>
